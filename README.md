@@ -1,6 +1,11 @@
 # yt-dlp Web Downloader
 
-A self-hosted web interface for yt-dlp to download videos from YouTube and other platforms.
+A self-hosted web interface for [yt-dlp](https://github.com/yt-dlp/yt-dlp) — the powerful command-line video downloader.
+
+If you love yt-dlp but want a simple, browser-based way to use it from any device on your network, this project is for you. It wraps the inimitable yt-dlp in a clean web UI, letting you download videos from YouTube and 1000+ other sites without touching the command line.
+
+![Light Theme](yt-dlp-screen-light.png)
+![Dark Theme](yt-dlp-dash-screen-dark.png)
 
 ## Features
 
