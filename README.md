@@ -21,47 +21,43 @@ If you love yt-dlp but want a simple, browser-based way to use it from any devic
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
-
-1. Clone or create the project directory
-2. Run the container:
+### 1. Clone the repository
 
 ```bash
-docker-compose up -d
+git clone https://github.com/SONDLecT/yt-dlp-dash.git
+cd yt-dlp-dash
 ```
 
-3. Access the web interface at `http://localhost:5000`
+### 2. Configure docker-compose
 
-### Using Docker directly
+Copy the example file and customize it:
 
 ```bash
-# Build the image
-docker build -t ytdlp-web .
-
-# Run the container
-docker run -d \
-  --name ytdlp-web \
-  -p 5000:5000 \
-  -v $(pwd)/downloads:/downloads \
-  ytdlp-web
+cp docker-compose.example.yml docker-compose.yml
 ```
 
-### Custom Port
+Edit `docker-compose.yml` to set:
+- **Port**: Change `5000:5000` if you want a different port (e.g., `8080:5000`)
+- **User**: Update `user: "1000:1000"` to match your user/group IDs (`id -u` and `id -g`)
+- **Volumes**: Add any additional directories you want accessible for downloads
 
-To use a different port, modify the docker-compose.yml or change the port mapping:
+### 3. Build and run
 
-```yaml
-ports:
-  - "8080:5000"  # Access on port 8080
+```bash
+docker compose up --build -d
 ```
 
-### Custom Download Directory
+### 4. Access the web interface
 
-Mount any directory as the download location:
+Open `http://localhost:5000` (or your configured port) in your browser.
 
-```yaml
-volumes:
-  - /path/to/your/downloads:/downloads
+### Updating
+
+To update to the latest version:
+
+```bash
+git pull
+docker compose up --build -d
 ```
 
 ## Usage
