@@ -1,0 +1,2363 @@
+{
+  "General Options": [
+    {
+      "short": "h",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "version",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "U",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-update",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "update-to",
+      "description": "CHANNEL can be a repository as well. CHANNEL and TAG default to \"stable\" and \"latest\" respectively if omitted; See \"UPDATE\" for details. Supported channels: stable, nightly, master",
+      "type": "choice",
+      "choices": [
+        "stable",
+        ""
+      ],
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "i",
+      "long": null,
+      "description": "The download will be considered successful even if the postprocessing fails",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-abort-on-error",
+      "description": "e.g. to skip unavailable videos in a playlist (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "abort-on-error",
+      "description": "error occurs (Alias: --no-ignore-errors)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-ignore-errors"
+      ]
+    },
+    {
+      "short": null,
+      "long": "list-extractors",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "extractor-descriptions",
+      "description": "extractors and exit",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "use-extractors",
+      "description": "You can also use regexes, \"all\", \"default\" and \"end\" (end URL matching); e.g. --ies \"holodex.*,end,youtube\". Prefix the name with a \"-\" to exclude it, e.g. --ies default,-generic. Use --list-extractors for a list of extractor names. (Alias: --ies)",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--ies"
+      ]
+    },
+    {
+      "short": null,
+      "long": "default-search",
+      "description": "\"gvsearch2:python\" downloads two videos from google videos for the search term \"python\". Use the value \"auto\" to let yt-dlp guess (\"auto_warning\" to emit a warning when guessing). \"error\" just throws an error. The default value \"fixup_error\" repairs broken URLs, but emits an error if this is not possible instead of searching",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ignore-config",
+      "description": "except those given to --config-locations. For backward compatibility, if this option is found inside the system configuration file, the user configuration is not loaded. (Alias: --no-config)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-config"
+      ]
+    },
+    {
+      "short": null,
+      "long": "no-config-locations",
+      "description": "(default). When given inside a configuration file, ignore all previous --config-locations defined in the current file",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "config-locations",
+      "description": "either the path to the config or its containing directory (\"-\" for stdin). Can be used multiple times and inside other configuration files",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "plugin-dirs",
+      "description": "for plugins. This option can be used multiple times to add multiple directories. Use \"default\" to search the default plugin directories (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-plugin-dirs",
+      "description": "including defaults and those provided by previous --plugin-dirs",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "js-runtimes",
+      "description": "with an optional location for the runtime (either the path to the binary or its containing directory). This option can be used multiple times to enable multiple runtimes. Supported runtimes are (in order of priority, from highest to lowest): deno, node, quickjs, bun. Only \"deno\" is enabled by default. The highest priority runtime that is both enabled and available will be used. In order to use a lower priority runtime when \"deno\" is available, --no-js- runtimes needs to be passed before enabling other runtimes",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-js-runtimes",
+      "description": "including defaults and those provided by previous --js-runtimes",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "remote-components",
+      "description": "when required. This option is currently not needed if you are using an official executable or have the requisite version of the yt-dlp-ejs package installed. You can use this option multiple times to allow multiple components. Supported values: ejs:npm (external JavaScript components from npm), ejs:github (external JavaScript components from yt-dlp-ejs GitHub). By default, no remote components are allowed",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-remote-components",
+      "description": "including any previously allowed by --remote-components or defaults.",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "flat-playlist",
+      "description": "entries; some entry metadata may be missing and downloading may be bypassed",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-flat-playlist",
+      "description": "(default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "live-from-start",
+      "description": "Currently experimental and only supported for YouTube and Twitch",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-live-from-start",
+      "description": "(default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "wait-for-video",
+      "description": "available. Pass the minimum number of seconds (or range) to wait between retries",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-wait-for-video",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "mark-watched",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-mark-watched",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "color",
+      "description": "optionally prefixed by the STREAM (stdout or stderr) to apply the setting to. Can be one of \"always\", \"auto\" (default), \"never\", or \"no_color\" (use non color terminal sequences). Use \"auto-tty\" or \"no_color-tty\" to decide based on terminal support only. Can be used multiple times",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "compat-options",
+      "description": "with youtube-dl or youtube-dlc configurations by reverting some of the changes made in yt-dlp. See \"Differences in default behavior\" for details",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "alias",
+      "description": "an alias starts with a dash \"-\", it is prefixed with \"--\". Arguments are parsed according to the Python string formatting mini-language. E.g. --alias get-audio,-X \"-S aext:{0},abr -x --audio-format {0}\" creates options \"--get-audio\" and \"-X\" that takes an argument (ARG0) and expands to \"-S aext:ARG0,abr -x --audio-format ARG0\". All defined aliases are listed in the --help output. Alias options can trigger more aliases; so be careful to avoid defining recursive options. As a safety measure, each alias may be triggered a maximum of 100 times. This option can be used multiple times",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "t",
+      "long": null,
+      "description": "--preset-alias mp3. The following presets are available: mp3, aac, mp4, mkv, sleep. See the \"Preset Aliases\" section at the end for more info. This option can be used multiple times",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Network Options": [
+    {
+      "short": null,
+      "long": "proxy",
+      "description": "enable SOCKS proxy, specify a proper scheme, e.g. socks5://user:pass@127.0.0.1:1080/. Pass in an empty string (--proxy \"\") for direct connection",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "socket-timeout",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "source-address",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "impersonate",
+      "description": "chrome, chrome-110, chrome:windows-10. Pass --impersonate=\"\" to impersonate any client. Note that forcing impersonation for all requests may have a detrimental impact on download speed and stability",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "list-impersonate-targets",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "4",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "6",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "enable-file-urls",
+      "description": "default for security reasons.",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Geo-restriction": [
+    {
+      "short": null,
+      "long": "geo-verification-proxy",
+      "description": "some geo-restricted sites. The default proxy specified by --proxy (or none, if the option is not present) is used for the actual downloading",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "xff",
+      "description": "try bypassing geographic restriction. One of \"default\" (only when known to be useful), \"never\", an IP block in CIDR notation, or a two-letter ISO 3166-2 country code",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Video Selection": [
+    {
+      "short": "I",
+      "long": null,
+      "description": "to download. You can specify a range using \"[START]:[STOP][:STEP]\". For backward compatibility, START-STOP is also supported. Use negative indices to count from the right and negative STEP to download in reverse order. E.g. \"-I 1:3,7,-5::2\" used on a playlist of size 15 will download the items at index 1,2,3,7,11,13,15",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "min-filesize",
+      "description": "SIZE, e.g. 50k or 44.6M",
+      "type": "number",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "max-filesize",
+      "description": "SIZE, e.g. 50k or 44.6M",
+      "type": "number",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "date",
+      "description": "The date can be \"YYYYMMDD\" or in the format [now|today|yesterday][-N[day|week|month|year]]. E.g. \"--date today-2weeks\" downloads only videos uploaded on the same day two weeks ago",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "datebefore",
+      "description": "this date. The date formats accepted are the same as --date",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "dateafter",
+      "description": "this date. The date formats accepted are the same as --date",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "match-filters",
+      "description": "field can be compared with a number or a string using the operators defined in \"Filtering Formats\". You can also simply specify a field to match if the field is present, use \"!field\" to check if the field is not present, and \"&\" to check multiple conditions. Use a \"\\\" to escape \"&\" or quotes if needed. If used multiple times, the filter matches if at least one of the conditions is met. E.g. --match-filters !is_live --match-filters \"like_count>?100 & description~='(?i)\\bcats \\& dogs\\b'\" matches only videos that are not live OR those that have a like count more than 100 (or the like field is not available) and also has a description that contains the phrase \"cats & dogs\" (caseless). Use \"--match-filters -\" to interactively ask whether to download each video",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-match-filters",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "break-match-filters",
+      "description": "download process when a video is rejected",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-break-match-filters",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-playlist",
+      "description": "to a video and a playlist",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "yes-playlist",
+      "description": "a video and a playlist",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "age-limit",
+      "description": "age",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "download-archive",
+      "description": "archive file. Record the IDs of all downloaded videos in it",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-download-archive",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "max-downloads",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "break-on-existing",
+      "description": "a file that is in the archive supplied with the --download-archive option",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-break-on-existing",
+      "description": "encountering a file that is in the archive (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "break-per-input",
+      "description": "--break-match-filters, and autonumber to reset per input URL",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-break-per-input",
+      "description": "terminates the entire download queue",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "skip-playlist-after-errors",
+      "description": "the playlist is skipped",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Download Options": [
+    {
+      "short": "N",
+      "long": null,
+      "description": "video that should be downloaded concurrently (default is 1)",
+      "type": "flag",
+      "choices": null,
+      "default": "is 1",
+      "aliases": []
+    },
+    {
+      "short": "r",
+      "long": null,
+      "description": "e.g. 50K or 4.2M",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "throttled-rate",
+      "description": "below which throttling is assumed and the video data is re-extracted, e.g. 100K",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "R",
+      "long": null,
+      "description": "\"infinite\"",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "file-access-retries",
+      "description": "error (default is 3), or \"infinite\"",
+      "type": "flag",
+      "choices": null,
+      "default": "is 3",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "fragment-retries",
+      "description": "10), or \"infinite\" (DASH, hlsnative and ISM)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "retry-sleep",
+      "description": "(optionally) prefixed by the type of retry (http (default), fragment, file_access, extractor) to apply the sleep to. EXPR can be a number, linear=START[:END[:STEP=1]] or exp=START[:END[:BASE=2]]. This option can be used multiple times to set the sleep for the different retry types, e.g. --retry-sleep linear=1::2 --retry-sleep fragment:exp=1:20",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "skip-unavailable-fragments",
+      "description": "hlsnative and ISM downloads (default) (Alias: --no-abort-on-unavailable-fragments)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-abort-on-unavailable-fragments"
+      ]
+    },
+    {
+      "short": null,
+      "long": "abort-on-unavailable-fragments",
+      "description": "Abort download if a fragment is unavailable (Alias: --no-skip-unavailable-fragments)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-skip-unavailable-fragments"
+      ]
+    },
+    {
+      "short": null,
+      "long": "keep-fragments",
+      "description": "downloading is finished",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-keep-fragments",
+      "description": "downloading is finished (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "buffer-size",
+      "description": "(default is 1024)",
+      "type": "number",
+      "choices": null,
+      "default": "is 1024",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "resize-buffer",
+      "description": "from an initial value of --buffer-size (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-resize-buffer",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "http-chunk-size",
+      "description": "downloading, e.g. 10485760 or 10M (default is disabled). May be useful for bypassing bandwidth throttling imposed by a webserver (experimental)",
+      "type": "number",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "playlist-random",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "lazy-playlist",
+      "description": "received. This disables n_entries, --playlist-random and --playlist-reverse",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-lazy-playlist",
+      "description": "the entire playlist is parsed (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "hls-use-mpegts",
+      "description": "allowing some players to play the video while downloading, and reducing the chance of file corruption if download is interrupted. This is enabled by default for live streams",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-hls-use-mpegts",
+      "description": "videos. This is default when not downloading live streams",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "download-sections",
+      "description": "regular expression. A \"*\" prefix denotes time-range instead of chapter. Negative timestamps are calculated from the end. \"*from-url\" can be used to download between the \"start_time\" and \"end_time\" extracted from the URL. Needs ffmpeg. This option can be used multiple times to download multiple sections, e.g. --download-sections \"*10:15-inf\" --download-sections \"intro\"",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "downloader",
+      "description": "use (optionally) prefixed by the protocols (http, ftp, m3u8, dash, rstp, rtmp, mms) to use it for. Currently supports native, aria2c, axel, curl, ffmpeg, httpie, wget. You can use this option multiple times to set different downloaders for different protocols. E.g. --downloader aria2c --downloader \"dash,m3u8:native\" will use aria2c for http/ftp downloads, and the native downloader for dash/m3u8 downloads (Alias: --external-downloader)",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--external-downloader"
+      ]
+    },
+    {
+      "short": null,
+      "long": "downloader-args",
+      "description": "downloader. Specify the downloader name and the arguments separated by a colon \":\". For ffmpeg, arguments can be passed to different positions using the same syntax as --postprocessor-args. You can use this option multiple times to give different arguments to different downloaders (Alias: --external-downloader-args)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Filesystem Options": [
+    {
+      "short": "a",
+      "long": null,
+      "description": "stdin), one URL per line. Lines starting with \"#\", \";\" or \"]\" are considered as comments and ignored",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-batch-file",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "P",
+      "long": null,
+      "description": "downloaded. Specify the type of file and the path separated by a colon \":\". All the same TYPES as --output are supported. Additionally, you can also provide \"home\" (default) and \"temp\" paths. All intermediary files are first downloaded to the temp path and then the final files are moved over to the home path after download is finished. This option is ignored if --output is an absolute path",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "o",
+      "long": null,
+      "description": "TEMPLATE\" for details",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "output-na-placeholder",
+      "description": "--output (default: \"NA\")",
+      "type": "flag",
+      "choices": null,
+      "default": "\"NA\"",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "restrict-filenames",
+      "description": "and avoid \"&\" and spaces in filenames",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-restrict-filenames",
+      "description": "filenames (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "windows-filenames",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-windows-filenames",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "trim-filenames",
+      "description": "extension) to the specified number of characters",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "w",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "force-overwrites",
+      "description": "option includes --no-continue",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-force-overwrites",
+      "description": "related files (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "c",
+      "long": null,
+      "description": "(default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-continue",
+      "description": "fragments. If the file is not fragmented, restart download of the entire file",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "part",
+      "description": "into output file (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-part",
+      "description": "output file",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "mtime",
+      "description": "modification time",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-mtime",
+      "description": "the file modification time (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-description",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-write-description",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-info-json",
+      "description": "(this may contain personal information)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-write-info-json",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-playlist-metafiles",
+      "description": "video metadata when using --write-info-json, --write-description etc. (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-write-playlist-metafiles",
+      "description": "--write-info-json, --write-description etc.",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "clean-info-json",
+      "description": "filenames from the infojson (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-clean-info-json",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-comments",
+      "description": "infojson. The comments are fetched even without this option if the extraction is known to be quick (Alias: --get-comments)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--get-comments"
+      ]
+    },
+    {
+      "short": null,
+      "long": "no-write-comments",
+      "description": "extraction is known to be quick (Alias: --no-get-comments)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "load-info-json",
+      "description": "(created with the \"--write-info-json\" option)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "cookies",
+      "description": "and dump cookie jar in",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-cookies",
+      "description": "(default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "cookies-from-browser",
+      "description": "The name of the browser to load cookies from. Currently supported browsers are: brave, chrome, chromium, edge, firefox, opera, safari, vivaldi, whale. Optionally, the KEYRING used for decrypting Chromium cookies on Linux, the name/path of the PROFILE to load cookies from, and the CONTAINER name (if Firefox) (\"none\" for no container) can be given with their respective separators. By default, all containers of the most recently accessed profile are used. Currently supported keyrings are: basictext, gnomekeyring, kwallet, kwallet5, kwallet6",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-cookies-from-browser",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "cache-dir",
+      "description": "store some downloaded information (such as client ids and signatures) permanently. By default ${XDG_CACHE_HOME}/yt-dlp",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-cache-dir",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "rm-cache-dir",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Thumbnail Options": [
+    {
+      "short": null,
+      "long": "write-thumbnail",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-write-thumbnail",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-all-thumbnails",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "list-thumbnails",
+      "description": "Simulate unless --no-simulate is used",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Internet Shortcut Options": [
+    {
+      "short": null,
+      "long": "write-link",
+      "description": "on the current platform (.url, .webloc or .desktop). The URL may be cached by the OS",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-url-link",
+      "description": "OS caches the URL based on the file path",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-webloc-link",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-desktop-link",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Verbosity and Simulation Options": [
+    {
+      "short": "q",
+      "long": null,
+      "description": "print the log to stderr",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-quiet",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-warnings",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "s",
+      "long": null,
+      "description": "anything to disk",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-simulate",
+      "description": "options are used",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ignore-no-formats-error",
+      "description": "extracting metadata even if the videos are not actually available for download (experimental)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-ignore-no-formats-error",
+      "description": "formats are found (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "skip-download",
+      "description": "related files (Alias: --no-download)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-download"
+      ]
+    },
+    {
+      "short": "O",
+      "long": null,
+      "description": "screen, optionally prefixed with when to print it, separated by a \":\". Supported values of \"WHEN\" are the same as that of --use-postprocessor (default: video). Implies --quiet. Implies --simulate unless --no-simulate or later stages of WHEN are used. This option can be used multiple times",
+      "type": "flag",
+      "choices": null,
+      "default": "video",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "print-to-file",
+      "description": "Append given template to the file. The values of WHEN and TEMPLATE are the same as that of --print. FILE uses the same syntax as the output template. This option can be used multiple times",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "j",
+      "long": null,
+      "description": "video. Simulate unless --no-simulate is used. See \"OUTPUT TEMPLATE\" for a description of available keys",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "J",
+      "long": null,
+      "description": "URL or infojson passed. Simulate unless --no-simulate is used. If the URL refers to a playlist, the whole playlist information is dumped in a single line",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "force-write-archive",
+      "description": "as far as no errors occur, even if -s or another simulation option is used (Alias: --force-download-archive)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "newline",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-progress",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "progress",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "console-title",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "progress-template",
+      "description": "Template for progress outputs, optionally prefixed with one of \"download:\" (default), \"download-title:\" (the console title), \"postprocess:\",  or \"postprocess-title:\". The video's fields are accessible under the \"info\" key and the progress attributes are accessible under \"progress\" key. E.g. --console-title --progress-template \"download-title:%(info.id)s-%(progress.eta)s\"",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "progress-delta",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "v",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "dump-pages",
+      "description": "to debug problems (very verbose)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-pages",
+      "description": "in the current directory to debug problems",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "print-traffic",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Workarounds": [
+    {
+      "short": null,
+      "long": "encoding",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "legacy-server-connect",
+      "description": "that do not support RFC 5746 secure renegotiation",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-check-certificates",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "prefer-insecure",
+      "description": "information about the video (Currently supported only for YouTube)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "add-headers",
+      "description": "separated by a colon \":\". You can use this option multiple times",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "bidi-workaround",
+      "description": "bidirectional text support. Requires bidiv or fribidi executable in PATH",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sleep-requests",
+      "description": "during data extraction",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sleep-interval",
+      "description": "download. This is the minimum time to sleep when used along with --max-sleep-interval (Alias: --min-sleep-interval)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--min-sleep-interval"
+      ]
+    },
+    {
+      "short": null,
+      "long": "max-sleep-interval",
+      "description": "be used along with --min-sleep-interval",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sleep-subtitles",
+      "description": "subtitle download",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Video Format Options": [
+    {
+      "short": "f",
+      "long": null,
+      "description": "for more details",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "S",
+      "long": null,
+      "description": "\"Sorting Formats\" for more details",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "format-sort-force",
+      "description": "precedence over all fields, see \"Sorting Formats\" for more details (Alias: --S-force)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--S-force"
+      ]
+    },
+    {
+      "short": null,
+      "long": "no-format-sort-force",
+      "description": "specified sort order (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "video-multistreams",
+      "description": "into a single file",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-video-multistreams",
+      "description": "output file (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "audio-multistreams",
+      "description": "into a single file",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-audio-multistreams",
+      "description": "output file (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "prefer-free-formats",
+      "description": "over non-free ones of the same quality. Use with \"-S ext\" to strictly prefer free containers irrespective of quality",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-prefer-free-formats",
+      "description": "containers (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "check-formats",
+      "description": "those that are actually downloadable",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "check-all-formats",
+      "description": "actually downloadable",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-check-formats",
+      "description": "downloadable",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "F",
+      "long": null,
+      "description": "Simulate unless --no-simulate is used",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "merge-output-format",
+      "description": "formats, separated by \"/\", e.g. \"mp4/mkv\". Ignored if no merge is required. (currently supported: avi, flv, mkv, mov, mp4, webm)",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Subtitle Options": [
+    {
+      "short": null,
+      "long": "write-subs",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-write-subs",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "write-auto-subs",
+      "description": "(Alias: --write-automatic-subs)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--write-automatic-subs"
+      ]
+    },
+    {
+      "short": null,
+      "long": "no-write-auto-subs",
+      "description": "(default) (Alias: --no-write-automatic-subs)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-write-automatic-subs"
+      ]
+    },
+    {
+      "short": null,
+      "long": "list-subs",
+      "description": "Simulate unless --no-simulate is used",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sub-format",
+      "description": "separated by \"/\", e.g. \"srt\" or \"ass/srt/best\"",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sub-langs",
+      "description": "be regex) or \"all\" separated by commas, e.g. --sub-langs \"en.*,ja\" (where \"en.*\" is a regex pattern that matches \"en\" followed by 0 or more of any character). You can prefix the language code with a \"-\" to exclude it from the requested languages, e.g. --sub- langs all,-live_chat. Use --list-subs for a list of available language tags",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Authentication Options": [
+    {
+      "short": "u",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "p",
+      "long": null,
+      "description": "out, yt-dlp will ask interactively",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "2",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "n",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "netrc-location",
+      "description": "either the path or its containing directory. Defaults to ~/.netrc",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "netrc-cmd",
+      "description": "for an extractor.",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "video-password",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ap-mso",
+      "description": "provider) identifier, use --ap-list-mso for a list of available MSOs",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ap-username",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ap-password",
+      "description": "If this option is left out, yt-dlp will ask interactively",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ap-list-mso",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "client-certificate",
+      "description": "format. May include the private key",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "client-certificate-key",
+      "description": "Path to private key file for client certificate",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "client-certificate-password",
+      "description": "Password for client certificate private key, if encrypted. If not provided, and the key is encrypted, yt-dlp will ask interactively",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Post-Processing Options": [
+    {
+      "short": "x",
+      "long": null,
+      "description": "(requires ffmpeg and ffprobe)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "audio-format",
+      "description": "used. (currently supported: best (default), aac, alac, flac, m4a, mp3, opus, vorbis, wav). You can specify multiple rules using similar syntax as --remux-video",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "audio-quality",
+      "description": "converting the audio with -x. Insert a value between 0 (best) and 10 (worst) for VBR or a specific bitrate like 128K (default 5)",
+      "type": "flag",
+      "choices": null,
+      "default": "5",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "remux-video",
+      "description": "necessary (currently supported: avi, flv, gif, mkv, mov, mp4, webm, aac, aiff, alac, flac, m4a, mka, mp3, ogg, opus, vorbis, wav). If the target container does not support the video/audio codec, remuxing will fail. You can specify multiple rules; e.g. \"aac>m4a/mov>mp4/mkv\" will remux aac to m4a, mov to mp4 and anything else to mkv",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "recode-video",
+      "description": "necessary. The syntax and supported formats are the same as --remux-video",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "postprocessor-args",
+      "description": "Specify the postprocessor/executable name and the arguments separated by a colon \":\" to give the argument to the specified postprocessor/executable. Supported PP are: Merger, ModifyChapters, SplitChapters, ExtractAudio, VideoRemuxer, VideoConvertor, Metadata, EmbedSubtitle, EmbedThumbnail, SubtitlesConvertor, ThumbnailsConvertor, FixupStretched, FixupM4a, FixupM3u8, FixupTimestamp and FixupDuration. The supported executables are: AtomicParsley, FFmpeg and FFprobe. You can also specify \"PP+EXE:ARGS\" to give the arguments to the specified executable only when being used by the specified postprocessor. Additionally, for ffmpeg/ffprobe, \"_i\"/\"_o\" can be appended to the prefix optionally followed by a number to pass the argument before the specified input/output file, e.g. --ppa \"Merger+ffmpeg_i1:-v quiet\". You can use this option multiple times to give different arguments to different postprocessors. (Alias: --ppa)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--ppa"
+      ]
+    },
+    {
+      "short": "k",
+      "long": null,
+      "description": "after post-processing",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-keep-video",
+      "description": "post-processing (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "post-overwrites",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-post-overwrites",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "embed-subs",
+      "description": "webm and mkv videos)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-embed-subs",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "embed-thumbnail",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-embed-thumbnail",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "embed-metadata",
+      "description": "embeds chapters/infojson if present unless --no-embed-chapters/--no-embed-info-json are used (Alias: --add-metadata)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--add-metadata"
+      ]
+    },
+    {
+      "short": null,
+      "long": "no-embed-metadata",
+      "description": "(Alias: --no-add-metadata)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-add-metadata"
+      ]
+    },
+    {
+      "short": null,
+      "long": "embed-chapters",
+      "description": "(Alias: --add-chapters)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--add-chapters"
+      ]
+    },
+    {
+      "short": null,
+      "long": "no-embed-chapters",
+      "description": "--no-add-chapters)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "embed-info-json",
+      "description": "mkv/mka video files",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-embed-info-json",
+      "description": "to the video file",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "parse-metadata",
+      "description": "Parse additional metadata like title/artist from other fields; see \"MODIFYING METADATA\" for details. Supported values of \"WHEN\" are the same as that of --use-postprocessor (default: pre_process)",
+      "type": "string",
+      "choices": null,
+      "default": "pre_process",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "replace-in-metadata",
+      "description": "Replace text in a metadata field using the given regex. This option can be used multiple times. Supported values of \"WHEN\" are the same as that of --use-postprocessor (default: pre_process)",
+      "type": "string",
+      "choices": null,
+      "default": "pre_process",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "xattrs",
+      "description": "(using Dublin Core and XDG standards)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "concat-playlist",
+      "description": "\"never\", \"always\", or \"multi_video\" (default; only when the videos form a single show). All the video files must have the same codecs and number of streams to be concatenable. The \"pl_video:\" prefix can be used with \"--paths\" and \"--output\" to set the output filename for the concatenated files. See \"OUTPUT TEMPLATE\" for details",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "fixup",
+      "description": "file. One of never (do nothing), warn (only emit a warning), detect_or_warn (the default; fix the file if we can, warn otherwise), force (try fixing even if the file already exists)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "ffmpeg-location",
+      "description": "path to the binary or its containing directory",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "exec",
+      "description": "when to execute it, separated by a \":\". Supported values of \"WHEN\" are the same as that of --use-postprocessor (default: after_move). The same syntax as the output template can be used to pass any field as arguments to the command. If no fields are passed, %(filepath,_filename|)q is appended to the end of the command. This option can be used multiple times",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-exec",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "convert-subs",
+      "description": "(currently supported: ass, lrc, srt, vtt). Use \"--convert-subs none\" to disable conversion (default) (Alias: --convert- subtitles)",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--convert-"
+      ]
+    },
+    {
+      "short": null,
+      "long": "convert-thumbnails",
+      "description": "(currently supported: jpg, png, webp). You can specify multiple rules using similar syntax as \"--remux-video\". Use \"--convert- thumbnails none\" to disable conversion (default)",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "split-chapters",
+      "description": "internal chapters. The \"chapter:\" prefix can be used with \"--paths\" and \"--output\" to set the output filename for the split files. See \"OUTPUT TEMPLATE\" for details",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-split-chapters",
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "remove-chapters",
+      "description": "given regular expression. The syntax is the same as --download-sections. This option can be used multiple times",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-remove-chapters",
+      "description": "(default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "force-keyframes-at-cuts",
+      "description": "downloading/splitting/removing sections. This is slow due to needing a re-encode, but the resulting video may have fewer artifacts around the cuts",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-force-keyframes-at-cuts",
+      "description": "when cutting/splitting (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "use-postprocessor",
+      "description": "The (case-sensitive) name of plugin postprocessors to be enabled, and (optionally) arguments to be passed to it, separated by a colon \":\". ARGS are a semicolon \";\" delimited list of NAME=VALUE. The \"when\" argument determines when the postprocessor is invoked. It can be one of \"pre_process\" (after video extraction), \"after_filter\" (after video passes filter), \"video\" (after --format; before --print/--output), \"before_dl\" (before each video download), \"post_process\" (after each video download; default), \"after_move\" (after moving the video file to its final location), \"after_video\" (after downloading and processing all formats of a video), or \"playlist\" (at end of playlist). This option can be used multiple times to add different postprocessors",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "SponsorBlock Options": [
+    {
+      "short": null,
+      "long": "sponsorblock-mark",
+      "description": "for, separated by commas. Available categories are sponsor, intro, outro, selfpromo, preview, filler, interaction, music_offtopic, hook, poi_highlight, chapter, all and default (=all). You can prefix the category with a \"-\" to exclude it. See [1] for descriptions of the categories. E.g. --sponsorblock-mark all,-preview [1] https://wiki.sponsor.ajay.app/w/Segment_Categories",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sponsorblock-remove",
+      "description": "the video file, separated by commas. If a category is present in both mark and remove, remove takes precedence. The syntax and available categories are the same as for --sponsorblock-mark except that \"default\" refers to \"all,-filler\" and poi_highlight, chapter are not available",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sponsorblock-chapter-title",
+      "description": "An output template for the title of the SponsorBlock chapters created by --sponsorblock-mark. The only available fields are start_time, end_time, category, categories, name, category_names. Defaults to \"[SponsorBlock]: %(category_names)l\"",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-sponsorblock",
+      "description": "--sponsorblock-remove",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "sponsorblock-api",
+      "description": "https://sponsor.ajay.app",
+      "type": "string",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Extractor Options": [
+    {
+      "short": null,
+      "long": "extractor-retries",
+      "description": "(default is 3), or \"infinite\"",
+      "type": "flag",
+      "choices": null,
+      "default": "is 3",
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "allow-dynamic-mpd",
+      "description": "(Alias: --no-ignore-dynamic-mpd)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-ignore-dynamic-mpd"
+      ]
+    },
+    {
+      "short": null,
+      "long": "ignore-dynamic-mpd",
+      "description": "(Alias: --no-allow-dynamic-mpd)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": [
+        "--no-allow-dynamic-mpd"
+      ]
+    },
+    {
+      "short": null,
+      "long": "hls-split-discontinuity",
+      "description": "discontinuities such as ad breaks",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "no-hls-split-discontinuity",
+      "description": "formats at discontinuities such as ad breaks (default)",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": null,
+      "long": "extractor-args",
+      "description": "See \"EXTRACTOR ARGUMENTS\" for details. You can use this option multiple times to give arguments for different extractors",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ],
+  "Preset Aliases": [
+    {
+      "short": "t",
+      "long": null,
+      "description": "mp3",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "t",
+      "long": null,
+      "description": "'ba[acodec^=aac]/ba[acodec^=mp4a.40.]/ba/b' -x --audio-format aac",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "t",
+      "long": null,
+      "description": "-S vcodec:h264,lang,quality,res,fps,hdr:12,a codec:aac",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "t",
+      "long": null,
+      "description": "",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    },
+    {
+      "short": "t",
+      "long": null,
+      "description": "--sleep-interval 10 --max-sleep-interval 20",
+      "type": "flag",
+      "choices": null,
+      "default": null,
+      "aliases": []
+    }
+  ]
+}

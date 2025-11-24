@@ -1,0 +1,19 @@
+services:
+  ytdlp-web:
+    build: .
+    container_name: ytdlp-web
+    user: "1000:1000"
+    ports:
+      - "5000:5000"
+    volumes:
+      # Default downloads folder
+      - ./downloads:/downloads
+      # Logs folder for debugging
+      - ./logs:/app/logs
+
+      # Mount additional drives/directories here
+      # Examples:
+      # - /mnt/storage:/storage
+      # - /home/user/Videos:/videos
+
+    restart: unless-stopped

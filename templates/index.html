@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yt-dlp Web Downloader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --card-bg: #141414;
+            --text-primary: #fafafa;
+            --text-secondary: #a1a1a1;
+            --border-color: #2a2a2a;
+            --input-bg: #0a0a0a;
+            --hover-bg: #252525;
+            --file-item-bg: #1a1a1a;
+            --file-item-hover: #252525;
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --accent-soft: rgba(6, 182, 212, 0.15);
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f4;
+            --bg-secondary: #e7e5e4;
+            --card-bg: #ffffff;
+            --text-primary: #1c1917;
+            --text-secondary: #57534e;
+            --border-color: #d6d3d1;
+            --input-bg: #fafaf9;
+            --hover-bg: #e7e5e4;
+            --file-item-bg: #f5f5f4;
+            --file-item-hover: #e7e5e4;
+            --accent: #0891b2;
+            --accent-hover: #0e7490;
+            --accent-soft: rgba(8, 145, 178, 0.12);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        code, pre, .monospace {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        @media (max-width: 640px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        
+        @media (max-width: 640px) {
+            .card {
+                padding: 20px;
+            }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .url-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.2s;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 640px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        
+        select:focus, input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-queue {
+            background: var(--success);
+        }
+
+        .btn-queue:hover {
+            background: #16a34a;
+        }
+
+        .btn-finished {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            animation: pulse-success 0.5s ease-out;
+        }
+
+        .btn-item-done {
+            animation: flash-success 0.4s ease-out;
+        }
+
+        @keyframes pulse-success {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes flash-success {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        
+        .downloads-section {
+            margin-top: 20px;
+        }
+        
+        .download-item {
+            background: var(--file-item-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .download-info {
+            flex: 1;
+        }
+        
+        .download-info .title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .download-info .status {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-downloading {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-queued, .status-starting {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .status-cancelled {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        [data-theme="light"] .status-queued,
+        [data-theme="light"] .status-starting {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95);
+            transition: transform 0.2s ease;
+        }
+
+        .modal-overlay.visible .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0 0 4px 0;
+            color: var(--text-primary);
+        }
+
+        .modal-header p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+
+        .playlist-video-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: var(--file-item-bg);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .playlist-video-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .playlist-video-index {
+            color: var(--text-secondary);
+            min-width: 30px;
+        }
+
+        .playlist-video-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+        }
+
+        .cancel-btn-small {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .cancel-btn-small:hover {
+            background: var(--error);
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+        
+        .advanced-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+        }
+        
+        .toggle-advanced {
+            background: none;
+            border: none;
+            color: var(--accent);
+            cursor: pointer;
+            font-weight: 600;
+            padding: 10px 0;
+        }
+        
+        .advanced-options {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .advanced-options.visible {
+            display: block;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            min-height: 100px;
+            resize: vertical;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+        
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--file-item-bg);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .file-item:hover {
+            background: var(--file-item-hover);
+        }
+        
+        @media (max-width: 640px) {
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .file-size {
+                margin: 5px 0 !important;
+            }
+        }
+        
+        .file-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 0 15px;
+        }
+        
+        .download-btn {
+            padding: 6px 12px;
+            background: var(--accent);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .download-btn:hover {
+            background: var(--accent-hover);
+        }
+        
+        .delete-btn {
+            padding: 6px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-primary);
+        }
+        
+        .browser-entry:hover {
+            transform: translateX(5px);
+            transition: transform 0.2s;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        .tab-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: var(--hover-bg);
+        }
+        
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        
+        .tab-panel {
+            display: none;
+            padding: 20px;
+            background: var(--file-item-bg);
+            border-radius: 8px;
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        .tab-panel h4 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .presets-bar {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 10px;
+            background: var(--file-item-bg);
+            border-radius: 6px;
+        }
+        
+        .preset-btn {
+            padding: 6px 12px;
+            margin: 0 5px;
+            background: var(--border-color);
+            border: none;
+            color: var(--text-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        @media (max-width: 640px) {
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .theme-toggle svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Playlist Confirmation Modal -->
+    <div id="playlistModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="playlistModalTitle">Playlist Found</h3>
+                <p id="playlistModalSubtitle">Select videos to download</p>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 12px; display: flex; gap: 10px;">
+                    <button type="button" class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="selectAllPlaylistVideos(true)">Select All</button>
+                    <button type="button" class="btn" style="padding: 6px 12px; font-size: 12px; background: var(--border-color); color: var(--text-primary);" onclick="selectAllPlaylistVideos(false)">Deselect All</button>
+                </div>
+                <div id="playlistVideoList"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: var(--border-color); color: var(--text-primary);" onclick="closePlaylistModal()">Cancel</button>
+                <button type="button" class="btn" id="playlistDownloadBtn" onclick="downloadSelectedPlaylistVideos()">Download Selected</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+    </button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎬 yt-dlp Web</h1>
+            <p>Download videos from YouTube and <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" target="_blank" style="color: var(--accent); text-decoration: none;">other platforms</a></p>
+            <div id="versionBadge" style="margin-top: 15px; display: none;">
+                <span style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
+                    <span id="versionText">v0.0.0</span>
+                    <button id="updateBtn" style="display: none; margin-left: 10px; padding: 4px 12px; background: var(--accent); color: #000; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
+                        Update Available
+                    </button>
+                </span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="input-group">
+                <label for="url">Video URL or Playlist</label>
+                <input type="text" id="url" class="url-input" placeholder="https://www.youtube.com/watch?v=..." />
+            </div>
+            
+            <div class="input-group">
+                <label>Save Location</label>
+                <div id="currentPath" style="padding: 10px 12px; background: var(--file-item-bg); border-radius: 6px; margin-bottom: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
+                    /downloads
+                </div>
+                <button type="button" class="btn" style="background: var(--file-item-bg); color: var(--text-primary); margin-bottom: 10px;" onclick="openFileBrowser()">📁 Browse Directories</button>
+                <div id="fileBrowser" style="display: none; background: var(--file-item-bg); border-radius: 8px; padding: 15px; max-height: 500px; overflow-y: auto;">
+                    <div id="browserPath" style="margin-bottom: 10px; padding: 8px 10px; background: var(--input-bg); border-radius: 4px; font-size: 12px; font-family: 'JetBrains Mono', monospace;"></div>
+                    <div id="browserContent" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
+
+                    <!-- New Folder UI -->
+                    <div id="newFolderContainer" style="display: none; margin-bottom: 15px; padding: 12px; background: var(--input-bg); border-radius: 4px; border: 1px solid var(--border-color);">
+                        <input type="text" id="newFolderName" placeholder="Enter folder name..." style="width: 100%; padding: 12px; background: var(--file-item-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; margin-bottom: 10px;" onkeypress="if(event.key==='Enter') createNewFolder()">
+                        <div style="display: flex; gap: 8px;">
+                            <button type="button" class="btn" style="flex: 1; background: #10b981; color: white; padding: 10px 16px;" onclick="createNewFolder()">Create</button>
+                            <button type="button" class="btn" style="flex: 1; background: var(--border-color); color: var(--text-primary); padding: 10px 16px;" onclick="cancelNewFolder()">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn" id="newFolderBtn" style="background: #10b981; color: white; padding: 10px 16px; white-space: nowrap;" onclick="showNewFolderInput()">📁 New Folder</button>
+                        <button type="button" class="btn" style="flex: 1; min-width: 150px; padding: 10px 16px;" onclick="selectCurrentDirectory()">Select This Directory</button>
+                        <button type="button" class="btn" style="background: var(--border-color); color: var(--text-primary); padding: 10px 16px; white-space: nowrap;" onclick="closeFileBrowser()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="options-grid">
+                <div class="input-group">
+                    <label for="format">Quality</label>
+                    <select id="format">
+                        <option value="best">Best Quality</option>
+                        <option value="bestvideo+bestaudio">Best Video + Audio</option>
+                        <option value="worst">Worst Quality (smallest)</option>
+                        <option value="1080p">1080p</option>
+                        <option value="720p">720p</option>
+                        <option value="480p">480p</option>
+                    </select>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="audioOnly">
+                    <label for="audioOnly">Audio Only (MP3)</label>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="subtitles">
+                    <label for="subtitles">Download Subtitles</label>
+                </div>
+                
+                <div class="checkbox-group" title="Download all videos in the playlist starting from this video">
+                    <input type="checkbox" id="downloadPlaylist">
+                    <label for="downloadPlaylist">Playlist</label>
+                </div>
+            </div>
+            
+            <div class="advanced-section">
+                <button class="toggle-advanced" onclick="toggleAdvanced()">⚙️ Advanced Options</button>
+                
+                <div id="advancedOptions" class="advanced-options">
+                    <!-- This will be populated with comprehensive options -->
+                    <div id="optionsLoader" style="text-align: center; padding: 20px;">
+                        <p>Loading comprehensive options...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" id="downloadBtn" onclick="startDownload()">Download</button>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">Active Downloads</h2>
+            <div id="activeDownloads">
+                <p style="color: #666; text-align: center;">No active downloads</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">Downloaded Files</h2>
+            <div id="fileList" class="file-list">
+                <p style="color: #666; text-align: center;">Loading...</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">Logs 
+                <button class="btn" style="float: right; padding: 5px 10px; font-size: 14px;" onclick="toggleLogs()">Show/Hide</button>
+            </h2>
+            <div id="logsSection" style="display: none;">
+                <button class="btn" style="margin-bottom: 10px; padding: 8px 15px;" onclick="refreshLogs()">🔄 Refresh Logs</button>
+                <pre id="logsContent" style="background: var(--input-bg); padding: 15px; border-radius: 6px; font-size: 12px; max-height: 400px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; white-space: pre-wrap; word-wrap: break-word; border: 1px solid var(--border-color);">Loading logs...</pre>
+            </div>
+        </div>
+        
+        <div class="card" style="text-align: center; background: var(--card-bg); margin-top: 40px;">
+            <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">
+                Powered by <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 600;">yt-dlp</a>
+                | <a href="https://github.com/yt-dlp/yt-dlp/blob/master/README.md" target="_blank" style="color: var(--accent); text-decoration: none;">Documentation</a>
+                | <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" target="_blank" style="color: var(--accent); text-decoration: none;">Supported Sites</a>
+            </p>
+            <p style="margin: 8px 0 0 0; color: var(--text-secondary); font-size: 12px;">
+                Special thanks to the yt-dlp community for maintaining this amazing tool
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        let activeDownloads = {};
+        let isUpdating = false;
+        
+        // Theme management (dark is default)
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const newTheme = isLight ? 'dark' : 'light';
+
+            if (newTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (theme === 'light') {
+                // Moon icon when in light mode (click to go dark)
+                icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+            } else {
+                // Sun icon when in dark mode (click to go light)
+                icon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+            }
+        }
+        
+        function toggleAdvanced() {
+            const options = document.getElementById('advancedOptions');
+            options.classList.toggle('visible');
+            
+            // Load comprehensive options if not already loaded
+            if (options.classList.contains('visible') && document.getElementById('optionsLoader')) {
+                fetch('/options')
+                    .then(response => response.text())
+                    .then(html => {
+                        options.innerHTML = html;
+                        initializeOptions();
+                    })
+                    .catch(error => {
+                        console.error('Error loading options:', error);
+                        options.innerHTML = '<p style="color: red; padding: 20px;">Error loading options. Please refresh the page.</p>';
+                    });
+            }
+        }
+        
+        function initializeOptions() {
+            console.log('Initializing options...');
+            // Initialize any event handlers for the loaded options
+            updateOptionsSummary();
+            
+            // Make functions available globally immediately
+            window.applyPreset = applyPreset;
+            window.clearAllOptions = clearAllOptions;
+            window.searchOptions = searchOptions;
+            window.showTab = showTab;
+            window.updateOptionsSummary = updateOptionsSummary;
+            window.showTabByName = showTabByName;
+            
+            // Add event listeners to all option inputs for live updates
+            setTimeout(() => {
+                console.log('Adding event listeners to option inputs...');
+                // Checkboxes
+                document.querySelectorAll('#advancedOptions input[type="checkbox"]').forEach(cb => {
+                    cb.addEventListener('change', updateOptionsSummary);
+                });
+                
+                // Text and number inputs
+                document.querySelectorAll('#advancedOptions input[type="text"], #advancedOptions input[type="number"]').forEach(input => {
+                    input.addEventListener('input', updateOptionsSummary);
+                });
+                
+                // Selects
+                document.querySelectorAll('#advancedOptions select').forEach(select => {
+                    select.addEventListener('change', updateOptionsSummary);
+                });
+                
+                // Textareas
+                document.querySelectorAll('#advancedOptions textarea').forEach(textarea => {
+                    textarea.addEventListener('input', updateOptionsSummary);
+                });
+                
+                console.log('Event listeners added');
+            }, 500); // Small delay to ensure DOM is fully loaded
+        }
+        
+        function showTab(tabName) {
+            // Hide all tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.style.display = 'none';
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn, .tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.display = 'block';
+            }
+            
+            // Mark the button as active
+            event.target.classList.add('active');
+        }
+        
+        async function checkVersion() {
+            try {
+                const response = await fetch('/version');
+                const data = await response.json();
+                
+                const versionBadge = document.getElementById('versionBadge');
+                const versionText = document.getElementById('versionText');
+                const updateBtn = document.getElementById('updateBtn');
+                
+                versionBadge.style.display = 'block';
+                versionText.textContent = `v${data.current}`;
+                
+                if (data.update_available) {
+                    updateBtn.style.display = 'inline-block';
+                    updateBtn.textContent = `Update to v${data.latest}`;
+                    updateBtn.onclick = updateYtdlp;
+                } else {
+                    updateBtn.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking version:', error);
+            }
+        }
+        
+        async function updateYtdlp() {
+            const message = `To update yt-dlp to the latest version:\n\n` +
+                          `1. Stop the container:\n   docker-compose down\n\n` +
+                          `2. Rebuild with latest yt-dlp:\n   docker-compose build --no-cache\n\n` +
+                          `3. Start the container:\n   docker-compose up -d\n\n` +
+                          `This ensures you get the latest version of yt-dlp.`;
+            alert(message);
+        }
+        
+        let currentBrowsePath = '/downloads';
+        let selectedDownloadPath = '/downloads';
+        
+        function openFileBrowser() {
+            document.getElementById('fileBrowser').style.display = 'block';
+            browseTo('/');
+        }
+        
+        function closeFileBrowser() {
+            document.getElementById('fileBrowser').style.display = 'none';
+        }
+        
+        function selectCurrentDirectory() {
+            selectedDownloadPath = currentBrowsePath;
+            document.getElementById('currentPath').textContent = selectedDownloadPath;
+            closeFileBrowser();
+        }
+        
+        async function browseTo(path) {
+            try {
+                const response = await fetch(`/browse?path=${encodeURIComponent(path)}`);
+                const data = await response.json();
+                
+                currentBrowsePath = data.current_path;
+                document.getElementById('browserPath').textContent = currentBrowsePath;
+                
+                const content = document.getElementById('browserContent');
+                
+                if (data.entries.length === 0) {
+                    content.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary);">No directories found</div>';
+                    return;
+                }
+                
+                content.innerHTML = data.entries.map(entry => {
+                    const icon = entry.type === 'parent' ? '⬆️' : '📁';
+                    const style = entry.writable ? '' : 'opacity: 0.5;';
+                    const title = entry.writable ? '' : 'title="Read-only"';
+                    
+                    return `
+                        <div class="browser-entry" style="padding: 10px; margin: 5px 0; background: var(--input-bg); border-radius: 4px; cursor: pointer; display: flex; align-items: center; ${style}" 
+                             onclick="browseTo('${entry.path.replace(/'/g, "\\'")}')"
+                             ${title}>
+                            <span style="margin-right: 10px;">${icon}</span>
+                            <span style="flex: 1;">${entry.name}</span>
+                            ${entry.writable && entry.type !== 'parent' ? '<span style="color: #10b981; font-size: 12px;">✓ Writable</span>' : ''}
+                            ${!entry.writable && entry.type !== 'parent' ? '<span style="color: #ef4444; font-size: 12px;">Read-only</span>' : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                // Update select button state based on writability
+                const selectBtn = document.querySelector('#fileBrowser button[onclick="selectCurrentDirectory()"]');
+                const newFolderBtn = document.getElementById('newFolderBtn');
+                if (data.writable) {
+                    selectBtn.disabled = false;
+                    selectBtn.textContent = 'Select This Directory';
+                    selectBtn.style.background = '';
+                    newFolderBtn.disabled = false;
+                    newFolderBtn.style.opacity = '1';
+                } else {
+                    selectBtn.disabled = true;
+                    selectBtn.textContent = 'Directory is Read-only';
+                    selectBtn.style.background = '#94a3b8';
+                    newFolderBtn.disabled = true;
+                    newFolderBtn.style.opacity = '0.5';
+                }
+            } catch (error) {
+                console.error('Error browsing directory:', error);
+                document.getElementById('browserContent').innerHTML =
+                    '<div style="padding: 20px; text-align: center; color: #ef4444;">Error loading directory</div>';
+            }
+        }
+
+        function showNewFolderInput() {
+            document.getElementById('newFolderContainer').style.display = 'block';
+            document.getElementById('newFolderName').value = '';
+            document.getElementById('newFolderName').focus();
+        }
+
+        function cancelNewFolder() {
+            document.getElementById('newFolderContainer').style.display = 'none';
+            document.getElementById('newFolderName').value = '';
+        }
+
+        async function createNewFolder() {
+            const folderName = document.getElementById('newFolderName').value.trim();
+
+            if (!folderName) {
+                alert('Please enter a folder name');
+                return;
+            }
+
+            try {
+                const response = await fetch('/create-folder', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        parent_path: currentBrowsePath,
+                        folder_name: folderName
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    cancelNewFolder();
+                    // Refresh the current directory to show the new folder
+                    await browseTo(currentBrowsePath);
+                } else {
+                    alert('Error creating folder: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error creating folder:', error);
+                alert('Error creating folder: ' + error.message);
+            }
+        }
+        
+        function showTab(tabId) {
+            // Hide all tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Mark the button as active
+            event.target.classList.add('active');
+        }
+        
+        // Removed old applyPreset - using the new one below
+        
+        function clearAllOptions() {
+            console.log('clearAllOptions called');
+            
+            // Clear all checkboxes
+            document.querySelectorAll('#advancedOptions input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            
+            // Clear all text inputs
+            document.querySelectorAll('#advancedOptions input[type="text"], #advancedOptions input[type="number"]').forEach(input => {
+                input.value = '';
+            });
+            
+            // Clear selects
+            document.querySelectorAll('#advancedOptions select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            // Clear textarea - check if it exists first
+            const customFlagsEl = document.getElementById('customFlags');
+            if (customFlagsEl) {
+                customFlagsEl.value = '';
+            }
+            
+            updateOptionsSummary();
+        }
+        
+        function searchOptions() {
+            const searchTerm = document.getElementById('optionSearch').value.toLowerCase();
+            if (!searchTerm) {
+                // Show all options if search is empty
+                document.querySelectorAll('.option-item, .option-group').forEach(item => {
+                    item.style.display = '';
+                });
+                return;
+            }
+            
+            // Hide/show options based on search
+            document.querySelectorAll('.option-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+        
+        function applyPreset(preset) {
+            console.log('applyPreset called with:', preset);
+            
+            // First ensure advanced options are visible and loaded
+            const advancedOptions = document.getElementById('advancedOptions');
+            
+            // Check if options are already loaded
+            const optionsLoaded = document.getElementById('downloadTab') !== null;
+            
+            if (!advancedOptions.classList.contains('visible')) {
+                console.log('Opening advanced options...');
+                toggleAdvanced();
+            }
+            
+            // Wait for options to be loaded
+            const waitTime = optionsLoaded ? 100 : 2000; // If not loaded, wait longer
+            console.log('Waiting', waitTime, 'ms for options to load...');
+            
+            setTimeout(() => {
+                console.log('Clearing all options...');
+                clearAllOptions();
+                
+                // Wait a moment more for options to be cleared, then apply preset
+                setTimeout(() => {
+                    console.log('Applying preset:', preset);
+                    switch(preset) {
+                        case 'highQuality':
+                            console.log('Applying High Quality preset...');
+                            // Navigate to Format tab and set high quality options
+                            showTabByName('formatSelectionTab');
+                            setTimeout(() => {
+                                const formatEl = document.getElementById('format');
+                                if (formatEl) {
+                                    formatEl.value = 'bestvideo[height<=2160]+bestaudio';
+                                    console.log('Set format to:', formatEl.value);
+                                } else {
+                                    console.log('Format element not found');
+                                }
+                                const audioQualityEl = document.getElementById('audioQuality');
+                                if (audioQualityEl) {
+                                    audioQualityEl.value = '0';
+                                    console.log('Set audio quality to:', audioQualityEl.value);
+                                }
+                                updateOptionsSummary();
+                            }, 100);
+                            break;
+                            
+                        case 'audioOnly':
+                            console.log('Applying Audio Only preset...');
+                            // Navigate to Post-Process tab and set audio-only options
+                            showTabByName('postprocessTab');
+                            setTimeout(() => {
+                                const extractAudioEl = document.getElementById('extractAudio');
+                                if (extractAudioEl) {
+                                    extractAudioEl.checked = true;
+                                    console.log('Checked extract audio');
+                                } else {
+                                    console.log('Extract audio element not found');
+                                }
+                                const audioFormatEl = document.getElementById('audioFormat');
+                                if (audioFormatEl) {
+                                    audioFormatEl.value = 'mp3';
+                                    console.log('Set audio format to:', audioFormatEl.value);
+                                } else {
+                                    console.log('Audio format element not found');
+                                }
+                                const audioQualEl = document.getElementById('audioQuality');
+                                if (audioQualEl) {
+                                    audioQualEl.value = '0';
+                                    console.log('Set audio quality to:', audioQualEl.value);
+                                } else {
+                                    console.log('Audio quality element not found');
+                                }
+                                updateOptionsSummary();
+                            }, 100);
+                            break;
+                            
+                        case 'lowBandwidth':
+                            console.log('Applying Low Bandwidth preset...');
+                            // Set format options
+                            showTabByName('formatSelectionTab');
+                            const formatLowEl = document.getElementById('format');
+                            if (formatLowEl) {
+                                formatLowEl.value = 'bestvideo[height<=480]+bestaudio';
+                                console.log('Set format to:', formatLowEl.value);
+                            }
+                            
+                            // Wait a bit then switch to download tab
+                            setTimeout(() => {
+                                showTabByName('downloadTab');
+                                const limitRateEl = document.getElementById('limitRate');
+                                if (limitRateEl) {
+                                    limitRateEl.value = '500K';
+                                    console.log('Set rate limit to:', limitRateEl.value);
+                                }
+                                updateOptionsSummary();
+                            }, 100);
+                            break;
+                            
+                        case 'archival':
+                            console.log('Applying Archival preset...');
+                            // Set archival options across multiple tabs
+                            // Filesystem tab
+                            showTabByName('filesystemTab');
+                            const writeInfoEl = document.getElementById('writeInfoJson');
+                            if (writeInfoEl) {
+                                writeInfoEl.checked = true;
+                                console.log('Checked write info JSON');
+                            }
+                            
+                            // Set other options with delays to ensure tab switching works
+                            setTimeout(() => {
+                                showTabByName('thumbnailsTab');
+                                const writeThumbnailEl = document.getElementById('writeThumbnail');
+                                if (writeThumbnailEl) {
+                                    writeThumbnailEl.checked = true;
+                                    console.log('Checked write thumbnail');
+                                }
+                            }, 100);
+                            
+                            setTimeout(() => {
+                                showTabByName('subtitleTab');
+                                const writeSubsEl = document.getElementById('writeSubs');
+                                if (writeSubsEl) {
+                                    writeSubsEl.checked = true;
+                                    console.log('Checked write subs');
+                                }
+                            }, 200);
+                            
+                            setTimeout(() => {
+                                showTabByName('postprocessTab');
+                                const embedMetadataEl = document.getElementById('embedMetadata');
+                                if (embedMetadataEl) embedMetadataEl.checked = true;
+                                const embedThumbnailEl = document.getElementById('embedThumbnail');
+                                if (embedThumbnailEl) embedThumbnailEl.checked = true;
+                                const embedSubsEl = document.getElementById('embedSubs');
+                                if (embedSubsEl) embedSubsEl.checked = true;
+                                console.log('Set all embed options');
+                                updateOptionsSummary();
+                            }, 300);
+                            break;
+                    }
+                    // Each case now calls updateOptionsSummary() after setting values
+                }, 200);
+            }, waitTime); // Use calculated wait time
+        }
+        
+        function showTabByName(tabName) {
+            // Hide all tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.style.display = 'none';
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.display = 'block';
+            }
+            
+            // Update button states
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.onclick && btn.onclick.toString().includes(tabName)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+        
+        function updateOptionsSummary() {
+            const summary = [];
+            const detailedSummary = [];
+            
+            // Check if advancedOptions exists
+            const advancedOptions = document.getElementById('advancedOptions');
+            if (!advancedOptions) return;
+            
+            // Collect all set options
+            document.querySelectorAll('#advancedOptions input[type="checkbox"]:checked').forEach(cb => {
+                if (cb.dataset.option) {
+                    const optionName = `--${cb.dataset.option}`;
+                    summary.push(optionName);
+                    
+                    // Get the label text for detailed summary
+                    const label = cb.parentElement.querySelector('label');
+                    if (label) {
+                        detailedSummary.push(`✓ ${label.textContent.trim()}`);
+                    }
+                }
+            });
+            
+            document.querySelectorAll('#advancedOptions input[type="text"], #advancedOptions input[type="number"]').forEach(input => {
+                if (input.value && input.dataset.option) {
+                    const optionName = `--${input.dataset.option}`;
+                    const value = input.value;
+                    summary.push(`${optionName} "${value}"`);
+                    
+                    // Get the label for detailed summary
+                    const label = input.parentElement.querySelector('label');
+                    if (label) {
+                        detailedSummary.push(`• ${label.textContent.trim()}: ${value}`);
+                    }
+                }
+            });
+            
+            document.querySelectorAll('#advancedOptions select').forEach(select => {
+                if (select.value && select.dataset.option) {
+                    const optionName = `--${select.dataset.option}`;
+                    const value = select.value;
+                    summary.push(`${optionName} "${value}"`);
+                    
+                    // Get the label for detailed summary
+                    const label = select.parentElement.querySelector('label');
+                    if (label) {
+                        const selectedText = select.options[select.selectedIndex].textContent;
+                        detailedSummary.push(`• ${label.textContent.trim()}: ${selectedText}`);
+                    }
+                }
+            });
+            
+            // Add SponsorBlock options if any are checked
+            const sbMarkOptions = [];
+            document.querySelectorAll('[id^="sbMark_"]:checked').forEach(cb => {
+                sbMarkOptions.push(cb.value);
+            });
+            if (sbMarkOptions.length > 0) {
+                summary.push(`--sponsorblock-mark ${sbMarkOptions.join(',')}`);
+                detailedSummary.push(`• SponsorBlock Mark: ${sbMarkOptions.join(', ')}`);
+            }
+            
+            const sbRemoveOptions = [];
+            document.querySelectorAll('[id^="sbRemove_"]:checked').forEach(cb => {
+                sbRemoveOptions.push(cb.value);
+            });
+            if (sbRemoveOptions.length > 0) {
+                summary.push(`--sponsorblock-remove ${sbRemoveOptions.join(',')}`);
+                detailedSummary.push(`• SponsorBlock Remove: ${sbRemoveOptions.join(', ')}`);
+            }
+            
+            // Add custom flags if the element exists
+            const customFlagsEl = document.getElementById('customFlags');
+            if (customFlagsEl && customFlagsEl.value) {
+                try {
+                    const flags = JSON.parse(customFlagsEl.value);
+                    summary.push('Custom JSON: ' + Object.keys(flags).length + ' options');
+                    detailedSummary.push(`• Custom JSON: ${Object.keys(flags).length} options`);
+                } catch {
+                    summary.push('Custom flags (invalid JSON)');
+                    detailedSummary.push('• Custom flags (invalid JSON)');
+                }
+            }
+            
+            // Update summary if element exists
+            const summaryEl = document.getElementById('optionsSummary');
+            if (summaryEl) {
+                if (detailedSummary.length > 0) {
+                    summaryEl.innerHTML = '<div style="line-height: 1.6;">' + 
+                        '<strong>Active Options (' + detailedSummary.length + '):</strong><br/>' +
+                        detailedSummary.join('<br/>') + 
+                        '</div>' + 
+                        '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 11px; opacity: 0.8;">' +
+                        '<strong>Command line equivalent:</strong><br/>' +
+                        '<code style="word-break: break-all;">' + summary.join(' ') + '</code>' +
+                        '</div>';
+                } else {
+                    summaryEl.innerHTML = '<em style="opacity: 0.7;">No advanced options set</em>';
+                }
+            }
+        }
+        
+        function collectAdvancedOptions() {
+            const options = {};
+            
+            // Collect checkbox options
+            document.querySelectorAll('#advancedOptions input[type="checkbox"]:checked').forEach(cb => {
+                if (cb.dataset.option) {
+                    const key = cb.dataset.option.replace(/-/g, '');
+                    options[key] = true;
+                }
+            });
+            
+            // Collect text/number inputs
+            document.querySelectorAll('#advancedOptions input[type="text"], #advancedOptions input[type="number"]').forEach(input => {
+                if (input.value && input.dataset.option) {
+                    const key = input.dataset.option.replace(/-/g, '');
+                    options[key] = input.type === 'number' ? parseInt(input.value) : input.value;
+                }
+            });
+            
+            // Collect select options
+            document.querySelectorAll('#advancedOptions select').forEach(select => {
+                if (select.value && select.dataset.option) {
+                    const key = select.dataset.option.replace(/-/g, '');
+                    options[key] = select.value;
+                }
+            });
+            
+            // Merge with custom JSON flags
+            const customFlagsElement = document.getElementById('customFlags');
+            if (customFlagsElement && customFlagsElement.value) {
+                try {
+                    const customOptions = JSON.parse(customFlagsElement.value);
+                    Object.assign(options, customOptions);
+                } catch (e) {
+                    console.error('Invalid JSON in custom flags:', e);
+                }
+            }
+            
+            return options;
+        }
+        
+        // Store current download settings for playlist modal
+        let pendingPlaylistDownload = null;
+
+        async function startDownload() {
+            const url = document.getElementById('url').value.trim();
+
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            const isPlaylistMode = document.getElementById('downloadPlaylist').checked;
+
+            // If playlist mode, extract playlist info first
+            if (isPlaylistMode) {
+                await extractAndShowPlaylist(url);
+                return;
+            }
+
+            // Single video download
+            await queueSingleDownload(url);
+        }
+
+        async function extractAndShowPlaylist(url) {
+            const btn = document.getElementById('downloadBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Extracting playlist...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/extract-playlist', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url })
+                });
+
+                const result = await response.json();
+
+                if (result.error && result.fallback) {
+                    // Extraction failed, fall back to native yt-dlp playlist handling
+                    if (confirm(`Could not extract playlist info: ${result.error}\n\nDownload using native playlist mode instead?`)) {
+                        await queueSingleDownload(url, true);
+                    }
+                    return;
+                }
+
+                if (!result.is_playlist) {
+                    // Not a playlist, just download the single video
+                    await queueSingleDownload(url);
+                    return;
+                }
+
+                // Show playlist modal
+                showPlaylistModal(result, url);
+
+            } catch (error) {
+                alert('Error extracting playlist: ' + error);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                updateDownloadButton();
+            }
+        }
+
+        function showPlaylistModal(playlistInfo, originalUrl) {
+            pendingPlaylistDownload = {
+                playlistInfo,
+                originalUrl,
+                settings: {
+                    downloadPath: selectedDownloadPath,
+                    format: document.getElementById('format').value,
+                    audioOnly: document.getElementById('audioOnly').checked,
+                    subtitles: document.getElementById('subtitles').checked,
+                    customFlags: collectAdvancedOptions()
+                }
+            };
+
+            document.getElementById('playlistModalTitle').textContent = playlistInfo.title || 'Playlist';
+            document.getElementById('playlistModalSubtitle').textContent =
+                `${playlistInfo.video_count} videos${playlistInfo.uploader ? ' by ' + playlistInfo.uploader : ''}`;
+
+            const listEl = document.getElementById('playlistVideoList');
+            listEl.innerHTML = playlistInfo.videos.map((video, i) => `
+                <div class="playlist-video-item">
+                    <input type="checkbox" id="playlist_video_${i}" data-url="${video.url}" data-title="${video.title}" checked>
+                    <span class="playlist-video-index">${video.index}.</span>
+                    <span class="playlist-video-title">${video.title}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('playlistModal').classList.add('visible');
+            updatePlaylistDownloadBtn();
+        }
+
+        function closePlaylistModal() {
+            document.getElementById('playlistModal').classList.remove('visible');
+            pendingPlaylistDownload = null;
+        }
+
+        function selectAllPlaylistVideos(selectAll) {
+            document.querySelectorAll('#playlistVideoList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectAll;
+            });
+            updatePlaylistDownloadBtn();
+        }
+
+        function updatePlaylistDownloadBtn() {
+            const selected = document.querySelectorAll('#playlistVideoList input[type="checkbox"]:checked').length;
+            const btn = document.getElementById('playlistDownloadBtn');
+            btn.textContent = `Download ${selected} Video${selected !== 1 ? 's' : ''}`;
+            btn.disabled = selected === 0;
+        }
+
+        // Add change listener for checkboxes
+        document.getElementById('playlistVideoList')?.addEventListener('change', updatePlaylistDownloadBtn);
+
+        async function downloadSelectedPlaylistVideos() {
+            if (!pendingPlaylistDownload) return;
+
+            const checkboxes = document.querySelectorAll('#playlistVideoList input[type="checkbox"]:checked');
+            const videos = Array.from(checkboxes).map(cb => ({
+                url: cb.dataset.url,
+                title: cb.dataset.title
+            }));
+
+            if (videos.length === 0) {
+                alert('Please select at least one video');
+                return;
+            }
+
+            closePlaylistModal();
+            document.getElementById('url').value = '';
+
+            // Queue each video individually
+            for (const video of videos) {
+                await queueSingleDownload(video.url, false, video.title);
+            }
+        }
+
+        async function cancelDownload(downloadId) {
+            try {
+                const response = await fetch(`/cancel/${downloadId}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    activeDownloads[downloadId].status = 'cancelled';
+                    activeDownloads[downloadId].message = 'Cancelled by user';
+                    updateActiveDownloads();
+                }
+            } catch (error) {
+                console.error('Failed to cancel download:', error);
+            }
+        }
+
+        async function queueSingleDownload(url, useNativePlaylist = false, displayTitle = null) {
+            const advancedOptions = pendingPlaylistDownload?.settings?.customFlags || collectAdvancedOptions();
+            const outputTemplateEl = document.getElementById('outputTemplate');
+            const playlistStartEl = document.getElementById('playlistStart');
+            const playlistEndEl = document.getElementById('playlistEnd');
+
+            const data = {
+                url: url,
+                downloadPath: pendingPlaylistDownload?.settings?.downloadPath || selectedDownloadPath,
+                format: pendingPlaylistDownload?.settings?.format || document.getElementById('format').value,
+                audioOnly: pendingPlaylistDownload?.settings?.audioOnly ?? document.getElementById('audioOnly').checked,
+                subtitles: pendingPlaylistDownload?.settings?.subtitles ?? document.getElementById('subtitles').checked,
+                downloadPlaylist: useNativePlaylist,
+                outputTemplate: advancedOptions.outtmpl || (outputTemplateEl ? outputTemplateEl.value.trim() : ''),
+                playlistStart: advancedOptions.playliststart || (playlistStartEl ? playlistStartEl.value : ''),
+                playlistEnd: advancedOptions.playlistend || (playlistEndEl ? playlistEndEl.value : ''),
+                customFlags: advancedOptions
+            };
+
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    activeDownloads[result.download_id] = {
+                        url: displayTitle || url,
+                        directory: data.downloadPath
+                    };
+                    document.getElementById('url').value = '';
+                    updateActiveDownloads();
+                    pollStatus(result.download_id);
+                } else {
+                    console.error('Download error:', result.error);
+                }
+            } catch (error) {
+                console.error('Failed to start download:', error);
+            }
+        }
+        
+        async function pollStatus(downloadId) {
+            const poll = async () => {
+                try {
+                    const response = await fetch(`/status/${downloadId}`);
+                    const status = await response.json();
+                    
+                    activeDownloads[downloadId] = status;
+                    updateActiveDownloads();
+                    
+                    if (status.status !== 'completed' && status.status !== 'error') {
+                        setTimeout(poll, 1000);
+                    } else {
+                        setTimeout(() => {
+                            delete activeDownloads[downloadId];
+                            updateActiveDownloads();
+                            loadFiles();
+                        }, 5000);
+                    }
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                }
+            };
+            
+            poll();
+        }
+        
+        function updateActiveDownloads() {
+            const container = document.getElementById('activeDownloads');
+            const downloads = Object.entries(activeDownloads);
+
+            if (downloads.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No active downloads</p>';
+                updateDownloadButton();
+                return;
+            }
+
+            // Count by status
+            const counts = {active: 0, completed: 0, error: 0, cancelled: 0};
+            downloads.forEach(([id, dl]) => {
+                if (dl.status === 'completed') counts.completed++;
+                else if (dl.status === 'error') counts.error++;
+                else if (dl.status === 'cancelled') counts.cancelled++;
+                else counts.active++;
+            });
+
+            let headerHtml = `<div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary);">
+                <span style="margin-right: 15px;">📥 Active: <strong style="color: var(--text-primary);">${counts.active}</strong></span>
+                ${counts.completed > 0 ? `<span style="margin-right: 15px;">✓ Done: <strong style="color: var(--success);">${counts.completed}</strong></span>` : ''}
+                ${counts.cancelled > 0 ? `<span style="margin-right: 15px;">⊘ Cancelled: <strong>${counts.cancelled}</strong></span>` : ''}
+                ${counts.error > 0 ? `<span>✗ Failed: <strong style="color: var(--error);">${counts.error}</strong></span>` : ''}
+            </div>`;
+
+            const itemsHtml = downloads.map(([id, download], index) => {
+                let statusClass = 'status-downloading';
+                let statusText = 'Downloading';
+
+                if (download.status === 'completed') {
+                    statusClass = 'status-completed';
+                    statusText = 'Completed';
+                } else if (download.status === 'error') {
+                    statusClass = 'status-error';
+                    statusText = 'Error';
+                } else if (download.status === 'cancelled') {
+                    statusClass = 'status-cancelled';
+                    statusText = 'Cancelled';
+                } else if (download.status === 'processing') {
+                    statusClass = 'status-processing';
+                    statusText = 'Processing';
+                } else if (download.status === 'starting') {
+                    statusClass = 'status-starting';
+                    statusText = 'Starting';
+                }
+
+                let progressHtml = '';
+                if (download.percent) {
+                    const percentValue = parseFloat(download.percent.replace('%', ''));
+                    progressHtml = `
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentValue}%"></div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">
+                            ${download.percent} • ${download.speed || ''} • ETA: ${download.eta || ''}
+                        </div>
+                    `;
+                }
+
+                // Show destination directory
+                const destHtml = download.directory ?
+                    `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">📁 ${download.directory}</div>` : '';
+
+                // Show cancel button for active downloads
+                const canCancel = !['completed', 'error', 'cancelled'].includes(download.status);
+                const cancelBtn = canCancel ?
+                    `<button class="cancel-btn-small" onclick="cancelDownload('${id}')" title="Cancel download">✕ Cancel</button>` : '';
+
+                return `
+                    <div class="download-item" style="position: relative;">
+                        <div class="download-info" style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div class="title" style="word-break: break-all; flex: 1;">${download.url || 'Unknown'}</div>
+                                ${cancelBtn}
+                            </div>
+                            ${destHtml}
+                            <div class="status" style="margin-top: 6px;">
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                                ${download.message || ''}
+                                ${download.error ? '<br><span style="color: var(--error); font-size: 12px; margin-top: 4px; display: inline-block;">' + download.error + '</span>' : ''}
+                            </div>
+                            ${progressHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = headerHtml + itemsHtml;
+            updateDownloadButton();
+        }
+
+        let previousCompletedCount = 0;
+        let buttonResetTimeout = null;
+
+        function updateDownloadButton() {
+            const btn = document.getElementById('downloadBtn');
+            if (!btn) return;
+
+            const downloads = Object.values(activeDownloads);
+            const activeCount = downloads.filter(dl => dl.status !== 'completed' && dl.status !== 'error').length;
+            const completedCount = downloads.filter(dl => dl.status === 'completed').length;
+            const totalCount = downloads.length;
+
+            // Clear any pending reset
+            if (buttonResetTimeout) {
+                clearTimeout(buttonResetTimeout);
+                buttonResetTimeout = null;
+            }
+
+            // Check if a new item just completed
+            if (completedCount > previousCompletedCount && previousCompletedCount >= 0) {
+                const justFinishedOne = completedCount - previousCompletedCount === 1;
+
+                if (activeCount === 0 && totalCount > 0) {
+                    // Entire queue finished
+                    showButtonFinished('✓ Finished!', true);
+                } else if (justFinishedOne && activeCount > 0) {
+                    // One item done, more in queue
+                    showButtonFinished('✓ 1 Done!', false);
+                }
+            }
+
+            previousCompletedCount = completedCount;
+
+            // Normal state (if not showing a completion message)
+            if (!btn.classList.contains('btn-finished')) {
+                if (activeCount > 0) {
+                    btn.textContent = '+ Add to Queue';
+                    btn.classList.add('btn-queue');
+                    btn.classList.remove('btn-finished', 'btn-item-done');
+                } else {
+                    btn.textContent = 'Download';
+                    btn.classList.remove('btn-queue', 'btn-finished', 'btn-item-done');
+                }
+            }
+        }
+
+        function showButtonFinished(text, isFullFinish) {
+            const btn = document.getElementById('downloadBtn');
+            if (!btn) return;
+
+            btn.textContent = text;
+            btn.classList.remove('btn-queue');
+            btn.classList.add(isFullFinish ? 'btn-finished' : 'btn-item-done');
+
+            // Reset after delay
+            buttonResetTimeout = setTimeout(() => {
+                btn.classList.remove('btn-finished', 'btn-item-done');
+                // Force update to correct state
+                const activeCount = Object.values(activeDownloads).filter(
+                    dl => dl.status !== 'completed' && dl.status !== 'error'
+                ).length;
+
+                if (activeCount > 0) {
+                    btn.textContent = '+ Add to Queue';
+                    btn.classList.add('btn-queue');
+                } else {
+                    btn.textContent = 'Download';
+                }
+            }, isFullFinish ? 3000 : 1500);
+        }
+        
+        function toggleLogs() {
+            const logsSection = document.getElementById('logsSection');
+            if (logsSection.style.display === 'none') {
+                logsSection.style.display = 'block';
+                refreshLogs();
+            } else {
+                logsSection.style.display = 'none';
+            }
+        }
+        
+        async function refreshLogs() {
+            try {
+                const response = await fetch('/logs?lines=200');
+                const data = await response.json();
+                
+                const logsContent = document.getElementById('logsContent');
+                if (data.logs) {
+                    logsContent.textContent = data.logs;
+                    // Auto-scroll to bottom
+                    logsContent.scrollTop = logsContent.scrollHeight;
+                } else {
+                    logsContent.textContent = 'No logs available';
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                document.getElementById('logsContent').textContent = 'Error loading logs';
+            }
+        }
+        
+        async function deleteFile(filePath, elementId) {
+            if (!confirm(`Are you sure you want to delete this file?\n\n${filePath.split('/').pop()}`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/delete-file', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ path: filePath })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    // Remove the file from the UI
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.style.transition = 'opacity 0.3s, transform 0.3s';
+                        element.style.opacity = '0';
+                        element.style.transform = 'translateX(-20px)';
+                        
+                        setTimeout(() => {
+                            element.remove();
+                            // Check if no files left
+                            const fileList = document.getElementById('fileList');
+                            if (fileList && !fileList.querySelector('.file-item')) {
+                                fileList.innerHTML = '<p style="color: #666; text-align: center;">No files yet</p>';
+                            }
+                        }, 300);
+                    }
+                } else {
+                    alert('Error deleting file: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Failed to delete file: ' + error);
+            }
+        }
+        
+        async function loadFiles() {
+            try {
+                const response = await fetch('/downloads');
+                const data = await response.json();
+                
+                const container = document.getElementById('fileList');
+                
+                if (data.files.length === 0) {
+                    container.innerHTML = '<p style="color: #666; text-align: center;">No files yet</p>';
+                    return;
+                }
+                
+                container.innerHTML = data.files.map((file, index) => {
+                    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    return `
+                        <div class="file-item" id="file-${index}">
+                            <div style="flex: 1;">
+                                <span class="file-name">${file.name}</span>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                                    📁 ${file.directory}
+                                </div>
+                            </div>
+                            <span class="file-size">${sizeInMB} MB</span>
+                            <div class="file-actions">
+                                <a href="/download-file?path=${encodeURIComponent(file.path)}" class="download-btn">💾 Download</a>
+                                <button class="delete-btn" onclick="deleteFile('${file.path.replace(/'/g, "\\'")}', 'file-${index}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+        
+        // Initialize theme on page load
+        initTheme();
+
+        // Initialize download button state
+        updateActiveDownloads();
+
+        // Load files on page load
+        loadFiles();
+        
+        // Check version on page load
+        checkVersion();
+        
+        // Refresh file list every 10 seconds
+        setInterval(loadFiles, 10000);
+        
+        // Check for updates every 30 minutes
+        setInterval(checkVersion, 30 * 60 * 1000);
+        
+        // Make functions globally available for dynamically loaded content
+        window.applyPreset = applyPreset;
+        window.clearAllOptions = clearAllOptions;
+        window.searchOptions = searchOptions;
+        window.showTab = showTab;
+        window.updateOptionsSummary = updateOptionsSummary;
+        window.showTabByName = showTabByName;
+    </script>
+</body>
+</html>

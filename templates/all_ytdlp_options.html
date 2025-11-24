@@ -1,0 +1,1669 @@
+<!-- Complete yt-dlp Options Interface -->
+<!-- This file contains UI controls for ALL 250+ yt-dlp options -->
+
+<!-- Current options summary - MOVED TO TOP FOR VISIBILITY -->
+<div class="options-summary" style="margin-bottom: 20px; padding: 15px; background: var(--file-item-bg); border: 2px solid var(--primary-color); border-radius: 8px;">
+    <h4 style="margin-top: 0; color: var(--primary-color);">📋 Active Options Summary</h4>
+    <div id="optionsSummary" style="font-family: monospace; font-size: 12px; color: var(--text-secondary);">
+        <em style="opacity: 0.7;">No advanced options set</em>
+    </div>
+</div>
+
+<!-- Search and presets bar -->
+<div class="input-group" style="margin-bottom: 20px;">
+    <input type="text" id="optionSearch" placeholder="🔍 Search for any yt-dlp option..." onkeyup="searchOptions()" style="background: var(--input-bg); color: var(--text-primary);">
+</div>
+
+<!-- Quick presets -->
+<div class="presets-bar" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+    <label style="margin-right: 10px;">Quick Presets:</label>
+    <button class="preset-btn" onclick="applyPreset('highQuality')">High Quality</button>
+    <button class="preset-btn" onclick="applyPreset('audioOnly')">Audio Only</button>
+    <button class="preset-btn" onclick="applyPreset('lowBandwidth')">Low Bandwidth</button>
+    <button class="preset-btn" onclick="applyPreset('archival')">Archival</button>
+    <button class="preset-btn" onclick="clearAllOptions()">Clear All</button>
+</div>
+
+<!-- Tabbed interface -->
+<div class="option-tabs">
+    <div class="tab-buttons" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 20px;">
+        <button class="tab-btn active" onclick="showTab('downloadTab')">Download</button>
+        <button class="tab-btn" onclick="showTab('filesystemTab')">Filesystem</button>
+        <button class="tab-btn" onclick="showTab('formatSelectionTab')">Format</button>
+        <button class="tab-btn" onclick="showTab('postprocessTab')">Post-Process</button>
+        <button class="tab-btn" onclick="showTab('sponsorBlockTab')">SponsorBlock</button>
+        <button class="tab-btn" onclick="showTab('networkTab')">Network</button>
+        <button class="tab-btn" onclick="showTab('videoSelectionTab')">Selection</button>
+        <button class="tab-btn" onclick="showTab('authTab')">Auth</button>
+        <button class="tab-btn" onclick="showTab('workaroundsTab')">Workarounds</button>
+        <button class="tab-btn" onclick="showTab('extractorTab')">Extractors</button>
+        <button class="tab-btn" onclick="showTab('verbosityTab')">Verbosity</button>
+        <button class="tab-btn" onclick="showTab('thumbnailsTab')">Thumbnails</button>
+        <button class="tab-btn" onclick="showTab('subtitleTab')">Subtitles</button>
+    </div>
+
+<style>
+.tab-panel {
+    display: none;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.tab-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.options-container {
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--file-item-bg);
+    border-radius: 8px;
+}
+
+.option-group {
+    margin-bottom: 30px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.option-group h5 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.option-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.option-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-item label {
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.option-item small {
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.option-item input[type="text"],
+.option-item input[type="number"],
+.option-item select,
+.option-item textarea {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+</style>
+
+<!-- Download Options Tab -->
+<div id="downloadTab" class="tab-panel active">
+    <h4>Download Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Rate Limiting & Performance</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="limitRate">Rate Limit</label>
+                    <input type="text" id="limitRate" data-option="limit-rate" placeholder="50K or 4.2M">
+                    <small>-r, --limit-rate RATE</small>
+                </div>
+                <div class="option-item">
+                    <label for="throttledRate">Throttled Rate</label>
+                    <input type="text" id="throttledRate" data-option="throttled-rate" placeholder="100K">
+                    <small>--throttled-rate RATE</small>
+                </div>
+                <div class="option-item">
+                    <label for="retries">Retries</label>
+                    <input type="number" id="retries" data-option="retries" placeholder="10" min="0">
+                    <small>-R, --retries RETRIES</small>
+                </div>
+                <div class="option-item">
+                    <label for="fileAccessRetries">File Access Retries</label>
+                    <input type="number" id="fileAccessRetries" data-option="file-access-retries" placeholder="10" min="0">
+                    <small>--file-access-retries RETRIES</small>
+                </div>
+                <div class="option-item">
+                    <label for="fragmentRetries">Fragment Retries</label>
+                    <input type="number" id="fragmentRetries" data-option="fragment-retries" placeholder="10" min="0">
+                    <small>--fragment-retries RETRIES</small>
+                </div>
+                <div class="option-item">
+                    <label for="concurrentFragments">Concurrent Fragments</label>
+                    <input type="number" id="concurrentFragments" data-option="concurrent-fragments" placeholder="1" min="1">
+                    <small>-N, --concurrent-fragments N</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Buffer & Timeouts</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="bufferSize">Buffer Size</label>
+                    <input type="text" id="bufferSize" data-option="buffer-size" placeholder="1024 or 16K">
+                    <small>--buffer-size SIZE</small>
+                </div>
+                <div class="option-item">
+                    <label for="httpChunkSize">HTTP Chunk Size</label>
+                    <input type="text" id="httpChunkSize" data-option="http-chunk-size" placeholder="10485760">
+                    <small>--http-chunk-size SIZE</small>
+                </div>
+                <div class="option-item">
+                    <label for="retryDelay">Retry Delay</label>
+                    <input type="number" id="retryDelay" data-option="retry-delay" placeholder="0" min="0">
+                    <small>--retry-delay DELAY</small>
+                </div>
+                <div class="option-item">
+                    <label for="readTimeout">Read Timeout</label>
+                    <input type="number" id="readTimeout" data-option="read-timeout" placeholder="30" min="0">
+                    <small>--read-timeout SECONDS</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Download Behavior</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noResizeBuffer" data-option="no-resize-buffer">
+                    <label for="noResizeBuffer">No Resize Buffer</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="skipUnavailableFragments" data-option="skip-unavailable-fragments">
+                    <label for="skipUnavailableFragments">Skip Unavailable Fragments</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="abortOnUnavailableFragments" data-option="abort-on-unavailable-fragments">
+                    <label for="abortOnUnavailableFragments">Abort on Unavailable Fragments</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="keepFragments" data-option="keep-fragments">
+                    <label for="keepFragments">Keep Fragments</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noKeepFragments" data-option="no-keep-fragments">
+                    <label for="noKeepFragments">Don't Keep Fragments</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="playlistRandom" data-option="playlist-random">
+                    <label for="playlistRandom">Randomize Playlist</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="lazyPlaylist" data-option="lazy-playlist">
+                    <label for="lazyPlaylist">Lazy Playlist</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noLazyPlaylist" data-option="no-lazy-playlist">
+                    <label for="noLazyPlaylist">No Lazy Playlist</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="xattrSetFilesize" data-option="xattr-set-filesize">
+                    <label for="xattrSetFilesize">Set Filesize in Extended Attributes</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>HLS/DASH Options</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="hlsUseMpegts" data-option="hls-use-mpegts">
+                    <label for="hlsUseMpegts">Use MPEG-TS for HLS</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noHlsUseMpegts" data-option="no-hls-use-mpegts">
+                    <label for="noHlsUseMpegts">Don't Use MPEG-TS for HLS</label>
+                </div>
+                <div class="option-item">
+                    <label for="hlsSplitDiscontinuity">HLS Split Discontinuity</label>
+                    <select id="hlsSplitDiscontinuity" data-option="hls-split-discontinuity">
+                        <option value="">Default</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>External Downloader</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="externalDownloader">External Downloader</label>
+                    <input type="text" id="externalDownloader" data-option="external-downloader" placeholder="aria2c, axel, curl, httpie, wget">
+                    <small>--external-downloader NAME</small>
+                </div>
+                <div class="option-item">
+                    <label for="externalDownloaderArgs">Downloader Arguments</label>
+                    <input type="text" id="externalDownloaderArgs" data-option="external-downloader-args" placeholder='"-j 8 -x 8"'>
+                    <small>--external-downloader-args ARGS</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filesystem Options Tab -->
+<div id="filesystemTab" class="tab-panel">
+    <h4>Filesystem Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Paths & Directories</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="paths">Output Paths</label>
+                    <textarea id="paths" data-option="paths" placeholder='{"home": "~/videos", "music": "~/music"}' rows="3"></textarea>
+                    <small>-P, --paths [TYPE:]PATH</small>
+                </div>
+                <div class="option-item">
+                    <label for="output">Output Template</label>
+                    <input type="text" id="output" data-option="output" placeholder="%(title)s.%(ext)s">
+                    <small>-o, --output TEMPLATE</small>
+                </div>
+                <div class="option-item">
+                    <label for="outputNaPlaceholder">NA Placeholder</label>
+                    <input type="text" id="outputNaPlaceholder" data-option="output-na-placeholder" placeholder="NA">
+                    <small>--output-na-placeholder TEXT</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Filename Restrictions</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="restrictFilenames" data-option="restrict-filenames">
+                    <label for="restrictFilenames">Restrict Filenames</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noRestrictFilenames" data-option="no-restrict-filenames">
+                    <label for="noRestrictFilenames">No Restrict Filenames</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="windowsFilenames" data-option="windows-filenames">
+                    <label for="windowsFilenames">Windows Filenames</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWindowsFilenames" data-option="no-windows-filenames">
+                    <label for="noWindowsFilenames">No Windows Filenames</label>
+                </div>
+                <div class="option-item">
+                    <label for="trimFilenames">Trim Filenames</label>
+                    <input type="number" id="trimFilenames" data-option="trim-filenames" placeholder="0" min="0">
+                    <small>--trim-filenames LENGTH</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Overwrite & Resume</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noOverwrites" data-option="no-overwrites">
+                    <label for="noOverwrites">No Overwrites (-w)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="forceOverwrites" data-option="force-overwrites">
+                    <label for="forceOverwrites">Force Overwrites</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="continue" data-option="continue">
+                    <label for="continue">Continue (-c)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noContinue" data-option="no-continue">
+                    <label for="noContinue">No Continue</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="part" data-option="part">
+                    <label for="part">Use Part Files</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noPart" data-option="no-part">
+                    <label for="noPart">No Part Files</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="mtime" data-option="mtime">
+                    <label for="mtime">Use Last-Modified Time</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noMtime" data-option="no-mtime">
+                    <label for="noMtime">No Last-Modified Time</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Write Metadata Files</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeDescription" data-option="write-description">
+                    <label for="writeDescription">Write Description</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWriteDescription" data-option="no-write-description">
+                    <label for="noWriteDescription">No Write Description</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeInfoJson" data-option="write-info-json">
+                    <label for="writeInfoJson">Write Info JSON</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWriteInfoJson" data-option="no-write-info-json">
+                    <label for="noWriteInfoJson">No Write Info JSON</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writePlaylistMetafiles" data-option="write-playlist-metafiles">
+                    <label for="writePlaylistMetafiles">Write Playlist Metafiles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWritePlaylistMetafiles" data-option="no-write-playlist-metafiles">
+                    <label for="noWritePlaylistMetafiles">No Write Playlist Metafiles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="cleanInfoJson" data-option="clean-info-json">
+                    <label for="cleanInfoJson">Clean Info JSON</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noCleanInfoJson" data-option="no-clean-info-json">
+                    <label for="noCleanInfoJson">No Clean Info JSON</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeComments" data-option="write-comments">
+                    <label for="writeComments">Write Comments</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWriteComments" data-option="no-write-comments">
+                    <label for="noWriteComments">No Write Comments</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Cookies & Cache</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="cookies">Cookies File</label>
+                    <input type="text" id="cookies" data-option="cookies" placeholder="/path/to/cookies.txt">
+                    <small>--cookies FILE</small>
+                </div>
+                <div class="option-item">
+                    <label for="cookiesFromBrowser">Cookies from Browser</label>
+                    <input type="text" id="cookiesFromBrowser" data-option="cookies-from-browser" placeholder="firefox:profile_name">
+                    <small>--cookies-from-browser BROWSER[:PROFILE[:KEYRING[:CONTAINER]]]</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noCookiesFromBrowser" data-option="no-cookies-from-browser">
+                    <label for="noCookiesFromBrowser">No Cookies from Browser</label>
+                </div>
+                <div class="option-item">
+                    <label for="cacheDir">Cache Directory</label>
+                    <input type="text" id="cacheDir" data-option="cache-dir" placeholder="~/.cache/yt-dlp">
+                    <small>--cache-dir DIR</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noCacheDir" data-option="no-cache-dir">
+                    <label for="noCacheDir">No Cache Directory</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rmCacheDir" data-option="rm-cache-dir">
+                    <label for="rmCacheDir">Remove Cache Directory</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Post-Processing Options Tab -->
+<div id="postprocessTab" class="tab-panel">
+    <h4>Post-Processing Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Audio Extraction</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="extractAudio" data-option="extract-audio">
+                    <label for="extractAudio">Extract Audio (-x)</label>
+                </div>
+                <div class="option-item">
+                    <label for="audioFormat">Audio Format</label>
+                    <select id="audioFormat" data-option="audio-format">
+                        <option value="">Best</option>
+                        <option value="aac">AAC</option>
+                        <option value="alac">ALAC</option>
+                        <option value="flac">FLAC</option>
+                        <option value="m4a">M4A</option>
+                        <option value="mp3">MP3</option>
+                        <option value="opus">Opus</option>
+                        <option value="vorbis">Vorbis</option>
+                        <option value="wav">WAV</option>
+                    </select>
+                    <small>--audio-format FORMAT</small>
+                </div>
+                <div class="option-item">
+                    <label for="audioQuality">Audio Quality</label>
+                    <select id="audioQuality" data-option="audio-quality">
+                        <option value="">Default</option>
+                        <option value="0">Best (0)</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">Medium (5)</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">Worst (9)</option>
+                    </select>
+                    <small>--audio-quality QUALITY</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Video Conversion</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="remuxVideo">Remux Video</label>
+                    <select id="remuxVideo" data-option="remux-video">
+                        <option value="">No Remux</option>
+                        <option value="mp4">MP4</option>
+                        <option value="mkv">MKV</option>
+                        <option value="flv">FLV</option>
+                        <option value="webm">WebM</option>
+                        <option value="mov">MOV</option>
+                        <option value="avi">AVI</option>
+                    </select>
+                    <small>--remux-video FORMAT</small>
+                </div>
+                <div class="option-item">
+                    <label for="recodeVideo">Recode Video</label>
+                    <select id="recodeVideo" data-option="recode-video">
+                        <option value="">No Recoding</option>
+                        <option value="mp4">MP4</option>
+                        <option value="mkv">MKV</option>
+                        <option value="flv">FLV</option>
+                        <option value="webm">WebM</option>
+                        <option value="mov">MOV</option>
+                        <option value="avi">AVI</option>
+                    </select>
+                    <small>--recode-video FORMAT</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="keepVideo" data-option="keep-video">
+                    <label for="keepVideo">Keep Video (-k)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noKeepVideo" data-option="no-keep-video">
+                    <label for="noKeepVideo">No Keep Video</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="postOverwrites" data-option="post-overwrites">
+                    <label for="postOverwrites">Post Overwrites</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noPostOverwrites" data-option="no-post-overwrites">
+                    <label for="noPostOverwrites">No Post Overwrites</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>FFmpeg Options</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="postprocessorArgs">Postprocessor Args</label>
+                    <textarea id="postprocessorArgs" data-option="postprocessor-args" placeholder='{"ffmpeg": "-c:v libx264 -preset slow"}' rows="2"></textarea>
+                    <small>--postprocessor-args NAME:ARGS</small>
+                </div>
+                <div class="option-item">
+                    <label for="ffmpegLocation">FFmpeg Location</label>
+                    <input type="text" id="ffmpegLocation" data-option="ffmpeg-location" placeholder="/usr/local/bin">
+                    <small>--ffmpeg-location PATH</small>
+                </div>
+                <div class="option-item">
+                    <label for="exec">Execute Command</label>
+                    <input type="text" id="exec" data-option="exec" placeholder='echo "Downloaded %(title)s"'>
+                    <small>--exec [WHEN:]CMD</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noExec" data-option="no-exec">
+                    <label for="noExec">No Execute</label>
+                </div>
+                <div class="option-item">
+                    <label for="convertSubs">Convert Subtitles</label>
+                    <select id="convertSubs" data-option="convert-subs">
+                        <option value="">No Conversion</option>
+                        <option value="srt">SRT</option>
+                        <option value="ass">ASS</option>
+                        <option value="vtt">VTT</option>
+                        <option value="lrc">LRC</option>
+                    </select>
+                    <small>--convert-subs FORMAT</small>
+                </div>
+                <div class="option-item">
+                    <label for="convertThumbnails">Convert Thumbnails</label>
+                    <select id="convertThumbnails" data-option="convert-thumbnails">
+                        <option value="">No Conversion</option>
+                        <option value="jpg">JPG</option>
+                        <option value="png">PNG</option>
+                        <option value="webp">WebP</option>
+                    </select>
+                    <small>--convert-thumbnails FORMAT</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="splitChapters" data-option="split-chapters">
+                    <label for="splitChapters">Split Chapters</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noSplitChapters" data-option="no-split-chapters">
+                    <label for="noSplitChapters">No Split Chapters</label>
+                </div>
+                <div class="option-item">
+                    <label for="removeChapters">Remove Chapters</label>
+                    <input type="text" id="removeChapters" data-option="remove-chapters" placeholder="sponsor,intro">
+                    <small>--remove-chapters REGEX</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noRemoveChapters" data-option="no-remove-chapters">
+                    <label for="noRemoveChapters">No Remove Chapters</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="forceKeyframesAtCuts" data-option="force-keyframes-at-cuts">
+                    <label for="forceKeyframesAtCuts">Force Keyframes at Cuts</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noForceKeyframesAtCuts" data-option="no-force-keyframes-at-cuts">
+                    <label for="noForceKeyframesAtCuts">No Force Keyframes at Cuts</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Embedding & Metadata</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="embedSubs" data-option="embed-subs">
+                    <label for="embedSubs">Embed Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noEmbedSubs" data-option="no-embed-subs">
+                    <label for="noEmbedSubs">No Embed Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="embedThumbnail" data-option="embed-thumbnail">
+                    <label for="embedThumbnail">Embed Thumbnail</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noEmbedThumbnail" data-option="no-embed-thumbnail">
+                    <label for="noEmbedThumbnail">No Embed Thumbnail</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="embedMetadata" data-option="embed-metadata">
+                    <label for="embedMetadata">Embed Metadata</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noEmbedMetadata" data-option="no-embed-metadata">
+                    <label for="noEmbedMetadata">No Embed Metadata</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="embedChapters" data-option="embed-chapters">
+                    <label for="embedChapters">Embed Chapters</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noEmbedChapters" data-option="no-embed-chapters">
+                    <label for="noEmbedChapters">No Embed Chapters</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="embedInfoJson" data-option="embed-info-json">
+                    <label for="embedInfoJson">Embed Info JSON</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noEmbedInfoJson" data-option="no-embed-info-json">
+                    <label for="noEmbedInfoJson">No Embed Info JSON</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="addMetadata" data-option="add-metadata">
+                    <label for="addMetadata">Add Metadata (Deprecated)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="xattrs" data-option="xattrs">
+                    <label for="xattrs">Write Extended Attributes</label>
+                </div>
+                <div class="option-item">
+                    <label for="parseMetadata">Parse Metadata</label>
+                    <input type="text" id="parseMetadata" data-option="parse-metadata" placeholder="title:%(artist)s - %(title)s">
+                    <small>--parse-metadata [FIELD:]REGEX</small>
+                </div>
+                <div class="option-item">
+                    <label for="replaceInMetadata">Replace in Metadata</label>
+                    <input type="text" id="replaceInMetadata" data-option="replace-in-metadata" placeholder="FIELD:REGEX:REPLACE">
+                    <small>--replace-in-metadata FIELD REGEX REPLACE</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Fixup & Compatibility</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="fixup">Fixup Policy</label>
+                    <select id="fixup" data-option="fixup">
+                        <option value="">Default</option>
+                        <option value="never">Never</option>
+                        <option value="warn">Warn</option>
+                        <option value="detect_or_warn">Detect or Warn</option>
+                        <option value="force">Force</option>
+                    </select>
+                    <small>--fixup POLICY</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="preferAvconv" data-option="prefer-avconv">
+                    <label for="preferAvconv">Prefer Avconv (Deprecated)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="preferFfmpeg" data-option="prefer-ffmpeg">
+                    <label for="preferFfmpeg">Prefer FFmpeg (Deprecated)</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SponsorBlock Options Tab -->
+<div id="sponsorBlockTab" class="tab-panel">
+    <h4>SponsorBlock Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>SponsorBlock Categories</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="sponsorblockMark">Mark Segments</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_sponsor" value="sponsor">
+                            <label for="sbMark_sponsor">Sponsor</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_intro" value="intro">
+                            <label for="sbMark_intro">Intro/Intermission</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_outro" value="outro">
+                            <label for="sbMark_outro">Outro/Credits</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_selfpromo" value="selfpromo">
+                            <label for="sbMark_selfpromo">Self Promotion</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_preview" value="preview">
+                            <label for="sbMark_preview">Preview/Recap</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_interaction" value="interaction">
+                            <label for="sbMark_interaction">Interaction Reminder</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_music_offtopic" value="music_offtopic">
+                            <label for="sbMark_music_offtopic">Non-Music Section</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_filler" value="filler">
+                            <label for="sbMark_filler">Filler Tangent</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_poi_highlight" value="poi_highlight">
+                            <label for="sbMark_poi_highlight">Highlight</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_chapter" value="chapter">
+                            <label for="sbMark_chapter">Chapter</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_all" value="all">
+                            <label for="sbMark_all">All Categories</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbMark_default" value="default">
+                            <label for="sbMark_default">Default Categories</label>
+                        </div>
+                    </div>
+                    <small>--sponsorblock-mark CATS</small>
+                </div>
+                
+                <div class="option-item">
+                    <label for="sponsorblockRemove">Remove Segments</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_sponsor" value="sponsor">
+                            <label for="sbRemove_sponsor">Sponsor</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_intro" value="intro">
+                            <label for="sbRemove_intro">Intro/Intermission</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_outro" value="outro">
+                            <label for="sbRemove_outro">Outro/Credits</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_selfpromo" value="selfpromo">
+                            <label for="sbRemove_selfpromo">Self Promotion</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_preview" value="preview">
+                            <label for="sbRemove_preview">Preview/Recap</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_interaction" value="interaction">
+                            <label for="sbRemove_interaction">Interaction Reminder</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_music_offtopic" value="music_offtopic">
+                            <label for="sbRemove_music_offtopic">Non-Music Section</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_filler" value="filler">
+                            <label for="sbRemove_filler">Filler Tangent</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_poi_highlight" value="poi_highlight">
+                            <label for="sbRemove_poi_highlight">Highlight</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_chapter" value="chapter">
+                            <label for="sbRemove_chapter">Chapter</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_all" value="all">
+                            <label for="sbRemove_all">All Categories</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sbRemove_default" value="default">
+                            <label for="sbRemove_default">Default Categories</label>
+                        </div>
+                    </div>
+                    <small>--sponsorblock-remove CATS</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>SponsorBlock Configuration</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="sponsorblockChapterTitle">Chapter Title</label>
+                    <input type="text" id="sponsorblockChapterTitle" data-option="sponsorblock-chapter-title" placeholder="[SponsorBlock]: %(category_names)l">
+                    <small>--sponsorblock-chapter-title TEMPLATE</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noSponsorblock" data-option="no-sponsorblock">
+                    <label for="noSponsorblock">Disable SponsorBlock</label>
+                </div>
+                <div class="option-item">
+                    <label for="sponsorblockApi">SponsorBlock API URL</label>
+                    <input type="text" id="sponsorblockApi" data-option="sponsorblock-api" placeholder="https://sponsor.ajay.app">
+                    <small>--sponsorblock-api URL</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Network Options Tab -->
+<div id="networkTab" class="tab-panel">
+    <h4>Network Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Proxy Settings</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="proxy">Proxy</label>
+                    <input type="text" id="proxy" data-option="proxy" placeholder="socks5://127.0.0.1:1080">
+                    <small>--proxy URL</small>
+                </div>
+                <div class="option-item">
+                    <label for="socketTimeout">Socket Timeout</label>
+                    <input type="number" id="socketTimeout" data-option="socket-timeout" placeholder="20" min="0">
+                    <small>--socket-timeout SECONDS</small>
+                </div>
+                <div class="option-item">
+                    <label for="sourceAddress">Source Address</label>
+                    <input type="text" id="sourceAddress" data-option="source-address" placeholder="0.0.0.0">
+                    <small>--source-address IP</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>IP Version</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="forceIPv4" data-option="force-ipv4">
+                    <label for="forceIPv4">Force IPv4 (-4)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="forceIPv6" data-option="force-ipv6">
+                    <label for="forceIPv6">Force IPv6 (-6)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enableFileUrls" data-option="enable-file-urls">
+                    <label for="enableFileUrls">Enable file:// URLs</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Geo Restriction</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="geoVerificationProxy">Geo Verification Proxy</label>
+                    <input type="text" id="geoVerificationProxy" data-option="geo-verification-proxy" placeholder="socks5://127.0.0.1:1080">
+                    <small>--geo-verification-proxy URL</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="geoBypass" data-option="geo-bypass">
+                    <label for="geoBypass">Geo Bypass</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noGeoBypass" data-option="no-geo-bypass">
+                    <label for="noGeoBypass">No Geo Bypass</label>
+                </div>
+                <div class="option-item">
+                    <label for="geoBypassCountry">Geo Bypass Country</label>
+                    <input type="text" id="geoBypassCountry" data-option="geo-bypass-country" placeholder="US">
+                    <small>--geo-bypass-country CODE</small>
+                </div>
+                <div class="option-item">
+                    <label for="geoBypassIpBlock">Geo Bypass IP Block</label>
+                    <input type="text" id="geoBypassIpBlock" data-option="geo-bypass-ip-block" placeholder="1.2.3.0/24">
+                    <small>--geo-bypass-ip-block IP_BLOCK</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Selection Options Tab -->
+<div id="videoSelectionTab" class="tab-panel">
+    <h4>Video Selection Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Playlist Selection</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="playlistReverse" data-option="playlist-reverse">
+                    <label for="playlistReverse">Playlist Reverse</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noPlaylistReverse" data-option="no-playlist-reverse">
+                    <label for="noPlaylistReverse">No Playlist Reverse</label>
+                </div>
+                <div class="option-item">
+                    <label for="playlistStart">Playlist Start</label>
+                    <input type="number" id="playlistStartSel" data-option="playlist-start" placeholder="1" min="1">
+                    <small>--playlist-start NUMBER</small>
+                </div>
+                <div class="option-item">
+                    <label for="playlistEnd">Playlist End</label>
+                    <input type="number" id="playlistEndSel" data-option="playlist-end" placeholder="10" min="1">
+                    <small>--playlist-end NUMBER</small>
+                </div>
+                <div class="option-item">
+                    <label for="playlistItems">Playlist Items</label>
+                    <input type="text" id="playlistItems" data-option="playlist-items" placeholder="1-3,7,10-13">
+                    <small>--playlist-items ITEM_SPEC</small>
+                </div>
+                <div class="option-item">
+                    <label for="maxDownloads">Max Downloads</label>
+                    <input type="number" id="maxDownloads" data-option="max-downloads" placeholder="10" min="1">
+                    <small>--max-downloads NUMBER</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Video Filters</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="matchFilter">Match Filter</label>
+                    <textarea id="matchFilter" data-option="match-filter" placeholder="duration > 600 & view_count > 10000" rows="2"></textarea>
+                    <small>--match-filter FILTER</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noMatchFilter" data-option="no-match-filter">
+                    <label for="noMatchFilter">No Match Filter</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="breakOnExisting" data-option="break-on-existing">
+                    <label for="breakOnExisting">Break on Existing</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="breakOnReject" data-option="break-on-reject">
+                    <label for="breakOnReject">Break on Reject</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="breakPerInput" data-option="break-per-input">
+                    <label for="breakPerInput">Break Per Input</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noBreakPerInput" data-option="no-break-per-input">
+                    <label for="noBreakPerInput">No Break Per Input</label>
+                </div>
+                <div class="option-item">
+                    <label for="skipPlaylistAfterErrors">Skip Playlist After Errors</label>
+                    <input type="number" id="skipPlaylistAfterErrors" data-option="skip-playlist-after-errors" placeholder="5" min="1">
+                    <small>--skip-playlist-after-errors N</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Date Filters</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="dateAfter">Date After</label>
+                    <input type="text" id="dateAfter" data-option="dateafter" placeholder="20220101 or 2 weeks ago">
+                    <small>--dateafter DATE</small>
+                </div>
+                <div class="option-item">
+                    <label for="dateBefore">Date Before</label>
+                    <input type="text" id="dateBefore" data-option="datebefore" placeholder="20221231 or today">
+                    <small>--datebefore DATE</small>
+                </div>
+                <div class="option-item">
+                    <label for="minViews">Min Views</label>
+                    <input type="number" id="minViews" data-option="min-views" placeholder="1000" min="0">
+                    <small>--min-views COUNT</small>
+                </div>
+                <div class="option-item">
+                    <label for="maxViews">Max Views</label>
+                    <input type="number" id="maxViews" data-option="max-views" placeholder="1000000" min="0">
+                    <small>--max-views COUNT</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Title Filters</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="matchTitle">Match Title</label>
+                    <input type="text" id="matchTitle" data-option="match-title" placeholder="regex pattern">
+                    <small>--match-title REGEX</small>
+                </div>
+                <div class="option-item">
+                    <label for="rejectTitle">Reject Title</label>
+                    <input type="text" id="rejectTitle" data-option="reject-title" placeholder="regex pattern">
+                    <small>--reject-title REGEX</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Download Archive</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="downloadArchive">Download Archive File</label>
+                    <input type="text" id="downloadArchive" data-option="download-archive" placeholder="/path/to/archive.txt">
+                    <small>--download-archive FILE</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noDownloadArchive" data-option="no-download-archive">
+                    <label for="noDownloadArchive">No Download Archive</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Authentication Options Tab -->
+<div id="authTab" class="tab-panel">
+    <h4>Authentication Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Login Credentials</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" data-option="username" placeholder="username">
+                    <small>-u, --username USERNAME</small>
+                </div>
+                <div class="option-item">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" data-option="password" placeholder="password">
+                    <small>-p, --password PASSWORD</small>
+                </div>
+                <div class="option-item">
+                    <label for="twofactor">Two-Factor Code</label>
+                    <input type="text" id="twofactor" data-option="twofactor" placeholder="000000">
+                    <small>-2, --twofactor TWOFACTOR</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="netrc" data-option="netrc">
+                    <label for="netrc">Use .netrc (-n)</label>
+                </div>
+                <div class="option-item">
+                    <label for="netrcLocation">Netrc Location</label>
+                    <input type="text" id="netrcLocation" data-option="netrc-location" placeholder="~/.netrc">
+                    <small>--netrc-location PATH</small>
+                </div>
+                <div class="option-item">
+                    <label for="netrcCmd">Netrc Command</label>
+                    <input type="text" id="netrcCmd" data-option="netrc-cmd" placeholder="gpg -d ~/.netrc.gpg">
+                    <small>--netrc-cmd CMD</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Video Password</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="videoPassword">Video Password</label>
+                    <input type="password" id="videoPassword" data-option="video-password" placeholder="video password">
+                    <small>--video-password PASSWORD</small>
+                </div>
+                <div class="option-item">
+                    <label for="apMso">Adobe Pass MSO</label>
+                    <input type="text" id="apMso" data-option="ap-mso" placeholder="provider">
+                    <small>--ap-mso MSO</small>
+                </div>
+                <div class="option-item">
+                    <label for="apUsername">Adobe Pass Username</label>
+                    <input type="text" id="apUsername" data-option="ap-username" placeholder="username">
+                    <small>--ap-username USERNAME</small>
+                </div>
+                <div class="option-item">
+                    <label for="apPassword">Adobe Pass Password</label>
+                    <input type="password" id="apPassword" data-option="ap-password" placeholder="password">
+                    <small>--ap-password PASSWORD</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="apListMso" data-option="ap-list-mso">
+                    <label for="apListMso">List Adobe Pass Providers</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Client Certificate</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="clientCertificate">Client Certificate</label>
+                    <input type="text" id="clientCertificate" data-option="client-certificate" placeholder="/path/to/cert.pem">
+                    <small>--client-certificate CERTFILE</small>
+                </div>
+                <div class="option-item">
+                    <label for="clientCertificateKey">Client Certificate Key</label>
+                    <input type="text" id="clientCertificateKey" data-option="client-certificate-key" placeholder="/path/to/key.pem">
+                    <small>--client-certificate-key KEYFILE</small>
+                </div>
+                <div class="option-item">
+                    <label for="clientCertificatePassword">Certificate Password</label>
+                    <input type="password" id="clientCertificatePassword" data-option="client-certificate-password" placeholder="password">
+                    <small>--client-certificate-password PASSWORD</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workarounds Tab -->
+<div id="workaroundsTab" class="tab-panel">
+    <h4>Workaround Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Encoding & Compatibility</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="encoding">Encoding</label>
+                    <input type="text" id="encoding" data-option="encoding" placeholder="utf-8">
+                    <small>--encoding ENCODING</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="legacyServerConnect" data-option="legacy-server-connect">
+                    <label for="legacyServerConnect">Legacy Server Connect</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noCheckCertificates" data-option="no-check-certificates">
+                    <label for="noCheckCertificates">No Check Certificates</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="preferInsecure" data-option="prefer-insecure">
+                    <label for="preferInsecure">Prefer Insecure</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Headers & User Agent</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="userAgent">User Agent</label>
+                    <input type="text" id="userAgent" data-option="user-agent" placeholder="Mozilla/5.0...">
+                    <small>--user-agent UA</small>
+                </div>
+                <div class="option-item">
+                    <label for="referer">Referer</label>
+                    <input type="text" id="referer" data-option="referer" placeholder="https://example.com">
+                    <small>--referer URL</small>
+                </div>
+                <div class="option-item">
+                    <label for="addHeader">Add Header</label>
+                    <input type="text" id="addHeader" data-option="add-header" placeholder="X-Custom-Header:value">
+                    <small>--add-header FIELD:VALUE</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="bidiWorkaround" data-option="bidi-workaround">
+                    <label for="bidiWorkaround">Bidi Workaround</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Sleep & Rate Control</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="sleepRequests">Sleep Between Requests</label>
+                    <input type="number" id="sleepRequests" data-option="sleep-requests" placeholder="1" min="0">
+                    <small>--sleep-requests SECONDS</small>
+                </div>
+                <div class="option-item">
+                    <label for="sleepInterval">Sleep Interval</label>
+                    <input type="number" id="sleepInterval" data-option="sleep-interval" placeholder="5" min="0">
+                    <small>--sleep-interval SECONDS</small>
+                </div>
+                <div class="option-item">
+                    <label for="maxSleepInterval">Max Sleep Interval</label>
+                    <input type="number" id="maxSleepInterval" data-option="max-sleep-interval" placeholder="30" min="0">
+                    <small>--max-sleep-interval SECONDS</small>
+                </div>
+                <div class="option-item">
+                    <label for="sleepSubtitles">Sleep Before Subtitles</label>
+                    <input type="number" id="sleepSubtitles" data-option="sleep-subtitles" placeholder="1" min="0">
+                    <small>--sleep-subtitles SECONDS</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Extractor Options Tab -->
+<div id="extractorTab" class="tab-panel">
+    <h4>Extractor Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Extractor Arguments</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="extractorArgs">Extractor Args</label>
+                    <textarea id="extractorArgs" data-option="extractor-args" placeholder='youtube:player_client=web,android;player_skip=webpage' rows="3"></textarea>
+                    <small>--extractor-args KEY:ARGS</small>
+                </div>
+                <div class="option-item">
+                    <label for="useExtractors">Use Extractors</label>
+                    <input type="text" id="useExtractors" data-option="use-extractors" placeholder="youtube,generic">
+                    <small>--use-extractors NAMES</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>YouTube Specific</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="youtubeSkipDashManifest" data-option="youtube-skip-dash-manifest">
+                    <label for="youtubeSkipDashManifest">Skip DASH Manifest</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="youtubeSkipHlsManifest" data-option="youtube-skip-hls-manifest">
+                    <label for="youtubeSkipHlsManifest">Skip HLS Manifest</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="youtubeIncludeDashManifest" data-option="youtube-include-dash-manifest">
+                    <label for="youtubeIncludeDashManifest">Include DASH Manifest (Deprecated)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="youtubeIncludeHlsManifest" data-option="youtube-include-hls-manifest">
+                    <label for="youtubeIncludeHlsManifest">Include HLS Manifest (Deprecated)</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Verbosity & Simulation Tab -->
+<div id="verbosityTab" class="tab-panel">
+    <h4>Verbosity & Simulation Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Output Control</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="quiet" data-option="quiet">
+                    <label for="quiet">Quiet (-q)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWarnings" data-option="no-warnings">
+                    <label for="noWarnings">No Warnings</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="simulate" data-option="simulate">
+                    <label for="simulate">Simulate (-s)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noSimulate" data-option="no-simulate">
+                    <label for="noSimulate">No Simulate</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="ignoreNoFormatsError" data-option="ignore-no-formats-error">
+                    <label for="ignoreNoFormatsError">Ignore No Formats Error</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noIgnoreNoFormatsError" data-option="no-ignore-no-formats-error">
+                    <label for="noIgnoreNoFormatsError">No Ignore No Formats Error</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="skipDownload" data-option="skip-download">
+                    <label for="skipDownload">Skip Download</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Printing Options</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="print">Print Fields</label>
+                    <input type="text" id="print" data-option="print" placeholder="%(title)s">
+                    <small>-O, --print [WHEN:]TEMPLATE</small>
+                </div>
+                <div class="option-item">
+                    <label for="printToFile">Print to File</label>
+                    <input type="text" id="printToFile" data-option="print-to-file" placeholder="[WHEN:]TEMPLATE FILE">
+                    <small>--print-to-file [WHEN:]TEMPLATE FILE</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="printTraffic" data-option="print-traffic">
+                    <label for="printTraffic">Print Traffic</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="printPages" data-option="print-pages">
+                    <label for="printPages">Print Pages</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writePages" data-option="write-pages">
+                    <label for="writePages">Write Pages</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="dumpPages" data-option="dump-pages">
+                    <label for="dumpPages">Dump Pages</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="progress" data-option="progress">
+                    <label for="progress">Force Progress Bar</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noProgress" data-option="no-progress">
+                    <label for="noProgress">No Progress Bar</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="progressTemplate" data-option="progress-template">
+                    <label for="progressTemplate">Progress Template</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="verbose" data-option="verbose">
+                    <label for="verbose">Verbose (-v)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="dumpJson" data-option="dump-json">
+                    <label for="dumpJson">Dump JSON (-j)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="dumpSingleJson" data-option="dump-single-json">
+                    <label for="dumpSingleJson">Dump Single JSON (-J)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="forceWriteArchive" data-option="force-write-archive">
+                    <label for="forceWriteArchive">Force Write Archive</label>
+                </div>
+                <div class="option-item">
+                    <label for="progressDelta">Progress Delta</label>
+                    <input type="number" id="progressDelta" data-option="progress-delta" placeholder="1" min="0">
+                    <small>--progress-delta SECONDS</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Console Title</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consoleTitle" data-option="console-title">
+                    <label for="consoleTitle">Console Title</label>
+                </div>
+                <div class="option-item">
+                    <label for="consoleTitleTemplate">Console Title Template</label>
+                    <input type="text" id="consoleTitleTemplate" data-option="console-title" placeholder="%(progress)s">
+                    <small>--console-title [TEMPLATE]</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Information Listing</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listExtractors" data-option="list-extractors">
+                    <label for="listExtractors">List Extractors</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="extractorDescriptions" data-option="extractor-descriptions">
+                    <label for="extractorDescriptions">Extractor Descriptions</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listThumbnails" data-option="list-thumbnails">
+                    <label for="listThumbnails">List Thumbnails</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listSubtitles" data-option="list-subs">
+                    <label for="listSubtitles">List Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listFormats" data-option="list-formats">
+                    <label for="listFormats">List Formats (-F)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getUrl" data-option="get-url">
+                    <label for="getUrl">Get URL (-g)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getTitle" data-option="get-title">
+                    <label for="getTitle">Get Title (-e)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getId" data-option="get-id">
+                    <label for="getId">Get ID</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getThumbnail" data-option="get-thumbnail">
+                    <label for="getThumbnail">Get Thumbnail</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getDescription" data-option="get-description">
+                    <label for="getDescription">Get Description</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getDuration" data-option="get-duration">
+                    <label for="getDuration">Get Duration</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getFilename" data-option="get-filename">
+                    <label for="getFilename">Get Filename</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="getFormat" data-option="get-format">
+                    <label for="getFormat">Get Format</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thumbnails Options Tab -->
+<div id="thumbnailsTab" class="tab-panel">
+    <h4>Thumbnail Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Thumbnail Settings</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeThumbnail" data-option="write-thumbnail">
+                    <label for="writeThumbnail">Write Thumbnail</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWriteThumbnail" data-option="no-write-thumbnail">
+                    <label for="noWriteThumbnail">No Write Thumbnail</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeAllThumbnails" data-option="write-all-thumbnails">
+                    <label for="writeAllThumbnails">Write All Thumbnails</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listThumbnailsOpt" data-option="list-thumbnails">
+                    <label for="listThumbnailsOpt">List Thumbnails</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Subtitle Options Tab -->
+<div id="subtitleTab" class="tab-panel">
+    <h4>Subtitle Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Subtitle Download</h5>
+            <div class="option-row">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeSubs" data-option="write-subs">
+                    <label for="writeSubs">Write Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWriteSubs" data-option="no-write-subs">
+                    <label for="noWriteSubs">No Write Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="writeAutoSubs" data-option="write-auto-subs">
+                    <label for="writeAutoSubs">Write Auto Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noWriteAutoSubs" data-option="no-write-auto-subs">
+                    <label for="noWriteAutoSubs">No Write Auto Subtitles</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listSubs" data-option="list-subs">
+                    <label for="listSubs">List Subtitles</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Subtitle Configuration</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="subFormat">Subtitle Format</label>
+                    <select id="subFormat" data-option="sub-format">
+                        <option value="">Best</option>
+                        <option value="ass">ASS</option>
+                        <option value="srt">SRT</option>
+                        <option value="vtt">VTT</option>
+                        <option value="lrc">LRC</option>
+                    </select>
+                    <small>--sub-format FORMAT</small>
+                </div>
+                <div class="option-item">
+                    <label for="subLangs">Subtitle Languages</label>
+                    <input type="text" id="subLangs" data-option="sub-langs" placeholder="en,es,fr or all">
+                    <small>--sub-langs LANGS</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Format Selection Tab -->
+<div id="formatSelectionTab" class="tab-panel">
+    <h4>Format Selection Options</h4>
+    <div class="options-container">
+        <div class="option-group">
+            <h5>Format Selection</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="format">Format</label>
+                    <select id="format" data-option="format">
+                        <option value="">Best Quality (default)</option>
+                        <option value="best">Best (deprecated)</option>
+                        <option value="worst">Worst</option>
+                        <option value="bestvideo+bestaudio">Best Video + Best Audio</option>
+                        <option value="bestvideo[ext=mp4]+bestaudio[ext=m4a]">Best MP4</option>
+                        <option value="bestvideo[height<=480]+bestaudio">480p</option>
+                        <option value="bestvideo[height<=720]+bestaudio">720p Max</option>
+                        <option value="bestvideo[height<=1080]+bestaudio">1080p Max</option>
+                        <option value="bestvideo[height<=1440]+bestaudio">1440p Max</option>
+                        <option value="bestvideo[height<=2160]+bestaudio">4K Max</option>
+                    </select>
+                    <small>-f, --format FORMAT</small>
+                </div>
+                <div class="option-item">
+                    <label for="formatSort">Format Sort</label>
+                    <input type="text" id="formatSort" data-option="format-sort" placeholder="res,fps,codec:vp9">
+                    <small>-S, --format-sort SORTORDER</small>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="formatSortForce" data-option="format-sort-force">
+                    <label for="formatSortForce">Force Format Sort</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noFormatSortForce" data-option="no-format-sort-force">
+                    <label for="noFormatSortForce">No Force Format Sort</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="videoMultistreams" data-option="video-multistreams">
+                    <label for="videoMultistreams">Allow Multiple Video Streams</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noVideoMultistreams" data-option="no-video-multistreams">
+                    <label for="noVideoMultistreams">No Multiple Video Streams</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="audioMultistreams" data-option="audio-multistreams">
+                    <label for="audioMultistreams">Allow Multiple Audio Streams</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noAudioMultistreams" data-option="no-audio-multistreams">
+                    <label for="noAudioMultistreams">No Multiple Audio Streams</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="preferFreeFormats" data-option="prefer-free-formats">
+                    <label for="preferFreeFormats">Prefer Free Formats</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noPreferFreeFormats" data-option="no-prefer-free-formats">
+                    <label for="noPreferFreeFormats">No Prefer Free Formats</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="checkFormats" data-option="check-formats">
+                    <label for="checkFormats">Check Formats</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="checkAllFormats" data-option="check-all-formats">
+                    <label for="checkAllFormats">Check All Formats</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noCheckFormats" data-option="no-check-formats">
+                    <label for="noCheckFormats">No Check Formats</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listFormatsOld" data-option="list-formats-old">
+                    <label for="listFormatsOld">List Formats (Old Style)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="listFormatsAsTable" data-option="list-formats-as-table">
+                    <label for="listFormatsAsTable">List Formats as Table</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="youtubeIncludeDashManifestFS" data-option="youtube-include-dash-manifest">
+                    <label for="youtubeIncludeDashManifestFS">Include DASH Manifest</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="youtubeIncludeHlsManifestFS" data-option="youtube-include-hls-manifest">
+                    <label for="youtubeIncludeHlsManifestFS">Include HLS Manifest</label>
+                </div>
+                <div class="option-item">
+                    <label for="mergeOutputFormat">Merge Output Format</label>
+                    <select id="mergeOutputFormat" data-option="merge-output-format">
+                        <option value="">Default</option>
+                        <option value="mp4">MP4</option>
+                        <option value="mkv">MKV</option>
+                        <option value="flv">FLV</option>
+                        <option value="webm">WebM</option>
+                        <option value="mov">MOV</option>
+                        <option value="avi">AVI</option>
+                    </select>
+                    <small>--merge-output-format FORMAT</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
+            <h5>Quality Limits</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="maxQuality">Max Quality</label>
+                    <select id="maxQuality" data-option="format">
+                        <option value="">No Limit</option>
+                        <option value="bestvideo[height<=144]+bestaudio">144p</option>
+                        <option value="bestvideo[height<=240]+bestaudio">240p</option>
+                        <option value="bestvideo[height<=360]+bestaudio">360p</option>
+                        <option value="bestvideo[height<=480]+bestaudio">480p</option>
+                        <option value="bestvideo[height<=720]+bestaudio">720p</option>
+                        <option value="bestvideo[height<=1080]+bestaudio">1080p</option>
+                        <option value="bestvideo[height<=1440]+bestaudio">1440p</option>
+                        <option value="bestvideo[height<=2160]+bestaudio">4K</option>
+                    </select>
+                    <small>Quality limit using format filter</small>
+                </div>
+                <div class="option-item">
+                    <label for="maxFilesize">Max Filesize</label>
+                    <input type="text" id="maxFilesize" data-option="max-filesize" placeholder="50M or 1G">
+                    <small>--max-filesize SIZE</small>
+                </div>
+                <div class="option-item">
+                    <label for="minFilesize">Min Filesize</label>
+                    <input type="text" id="minFilesize" data-option="min-filesize" placeholder="10K or 1M">
+                    <small>--min-filesize SIZE</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- End of option-tabs -->

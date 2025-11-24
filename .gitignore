@@ -1,0 +1,32 @@
+# Downloaded files
+downloads/
+
+# Local docker-compose (use docker-compose.example.yml as template)
+docker-compose.yml
+
+# Logs
+logs/
+*.log
+
+# Screenshots with personal data
+Screenshot*.png
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
