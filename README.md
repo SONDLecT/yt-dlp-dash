@@ -1,179 +1,115 @@
-# yt-dlp Web Downloader
+# yt-dlp-dash
 
-A self-hosted web interface for [yt-dlp](https://github.com/yt-dlp/yt-dlp) — the powerful command-line video downloader.
+A self-hosted web interface for [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
-If you love yt-dlp but want a simple, browser-based way to use it from any device on your network, this project is for you. It wraps the inimitable yt-dlp in a clean web UI, letting you download videos from YouTube and 1000+ other sites without touching the command line.
+Download videos from YouTube and [1000+ other sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) through a clean, browser-based UI—no command line required.
 
-![Light Theme](yt-dlp-screen-light.png)
-![Dark Theme](yt-dlp-dash-screen-dark.png)
+<p align="center">
+  <img src="yt-dlp-screen-light.png" alt="Light theme" width="45%">
+  <img src="yt-dlp-dash-screen-dark.png" alt="Dark theme" width="45%">
+</p>
 
 ## Features
 
-- 🎬 Clean, modern web interface
-- 📺 Support for YouTube videos and playlists
-- 🌐 Works with 1000+ sites supported by yt-dlp
-- ⚙️ Configurable download options (quality, format, audio-only)
-- 📝 Subtitle download support
-- 📊 Real-time download progress tracking
-- 🗂️ File management with direct downloads
-- 🔧 Advanced options with custom yt-dlp flags
-- 🐳 Fully containerized with Docker
+- Download videos and playlists from YouTube and 1000+ supported sites
+- Quality selection (4K, 1080p, 720p, etc.) and format options
+- Audio-only extraction with MP3 conversion
+- Subtitle downloads
+- Real-time progress tracking
+- Built-in file manager for retrieving downloads
+- Custom yt-dlp flags via JSON for advanced users
+- Runs in Docker with minimal configuration
 
 ## Quick Start
 
-### 1. Clone the repository
-
 ```bash
+# Clone the repository
 git clone https://github.com/SONDLecT/yt-dlp-dash.git
 cd yt-dlp-dash
-```
 
-### 2. Configure docker-compose
-
-Copy the example file and customize it:
-
-```bash
+# Copy and configure docker-compose
 cp docker-compose.example.yml docker-compose.yml
-```
 
-Edit `docker-compose.yml` to set:
-- **Port**: Change `5000:5000` if you want a different port (e.g., `8080:5000`)
-- **User**: Update `user: "1000:1000"` to match your user/group IDs (`id -u` and `id -g`)
-- **Volumes**: Add any additional directories you want accessible for downloads
-
-### 3. Build and run
-
-```bash
+# Build and run
 docker compose up --build -d
 ```
 
-### 4. Access the web interface
+Open `http://localhost:5000` in your browser.
 
-Open `http://localhost:5000` (or your configured port) in your browser.
+### Configuration
 
-### Updating
+Edit `docker-compose.yml` to customize:
 
-To update to the latest version:
-
-```bash
-git pull
-docker compose up --build -d
-```
+| Setting | Description |
+|---------|-------------|
+| `5000:5000` | Change the first number to use a different port |
+| `user: "1000:1000"` | Match your UID/GID (run `id -u` and `id -g`) |
+| Volumes | Mount additional directories for downloads |
 
 ## Usage
 
-### Basic Download
+**Basic download**: Paste a URL, select quality, click Download.
 
-1. Paste a YouTube URL (video or playlist) into the input field
-2. Select quality/format options
-3. Click "Download"
+**Audio only**: Check "Audio Only (MP3)" to extract audio.
 
-### Audio Only
+**Playlists**: Paste a playlist URL. Use Advanced Options to set start/end indices.
 
-Check the "Audio Only (MP3)" option to extract audio and convert to MP3.
-
-### Playlist Downloads
-
-- Paste a playlist URL
-- Optionally set start/end indices in Advanced Options
-- All videos will be downloaded sequentially
-
-### Advanced Options
-
-Click "⚙️ Advanced Options" to access:
-
-- **Output Template**: Customize filename format using yt-dlp template syntax
-  - Example: `%(uploader)s - %(title)s.%(ext)s`
-- **Playlist Range**: Download specific videos from a playlist
-- **Custom Flags**: Add any yt-dlp option as JSON
-  - Example: `{"writeinfojson": true, "writethumbnail": true}`
-
-### Supported Sites
-
-yt-dlp supports 1000+ sites including:
-- YouTube (videos, playlists, channels)
-- Vimeo
-- Twitter/X
-- TikTok
-- Twitch
-- Reddit
-- And many more...
-
-See the [full list](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md).
-
-## Configuration
-
-### Environment Variables
-
-- `DOWNLOAD_DIR`: Directory where files are saved (default: `/downloads`)
-
-### Custom yt-dlp Options
-
-Use the "Custom Flags" JSON field to pass any yt-dlp option:
+**Advanced Options**: Access custom output templates, playlist ranges, and arbitrary yt-dlp flags via JSON:
 
 ```json
 {
   "writeinfojson": true,
   "writethumbnail": true,
   "embedthumbnail": true,
-  "embedsubtitles": true,
   "format": "bestvideo[height<=1080]+bestaudio/best"
 }
 ```
 
-## File Management
-
-Downloaded files appear in the "Downloaded Files" section:
-- View file name and size
-- Click "Download" to retrieve files from the server
-- Files are stored in the mounted volume
-
-## Technical Details
-
-- **Backend**: Python Flask
-- **Downloader**: yt-dlp (latest version)
-- **Media Processing**: ffmpeg
-- **Container**: Python 3.11 slim base image
-
 ## Updating
 
-To update yt-dlp to the latest version:
+```bash
+git pull
+docker compose up --build -d
+```
+
+To force a fresh yt-dlp version:
 
 ```bash
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+docker compose build --no-cache
+docker compose up -d
 ```
 
 ## Troubleshooting
 
-### Downloads fail with "format not available"
-- Try selecting "Best Quality" or a different quality preset
-- Some videos may not have all quality options available
+| Problem | Solution |
+|---------|----------|
+| "Format not available" | Try "Best Quality" or a different preset |
+| Audio extraction fails | Check logs: `docker logs ytdlp-web` |
+| Can't access UI | Verify port isn't in use, check firewall, confirm container is running (`docker ps`) |
 
-### Audio extraction fails
-- Ensure ffmpeg is installed in the container (it should be by default)
-- Check container logs: `docker logs ytdlp-web`
+## Security
 
-### Can't access the web interface
-- Ensure the port isn't already in use
-- Check firewall settings
-- Verify container is running: `docker ps`
+This application is designed for private network use. If exposing to the internet:
 
-## Security Notes
+- Add authentication (reverse proxy with basic auth, Authelia, etc.)
+- Use HTTPS
+- Restrict access by IP if possible
 
-- This app is meant for self-hosting on a private network
-- Do not expose directly to the internet without additional security measures
-- Consider adding authentication if deploying publicly
-- Respect copyright laws and terms of service for downloaded content
+Respect copyright laws and terms of service when downloading content.
+
+## Tech Stack
+
+- **Backend**: Flask (Python 3.11)
+- **Downloader**: yt-dlp
+- **Media processing**: ffmpeg
+- **Container**: Docker
 
 ## License
 
-This project uses yt-dlp which is Unlicense licensed. Check individual dependencies for their licenses.
+This project is released into the public domain under the [Unlicense](https://unlicense.org/). See [LICENSE](LICENSE) for details.
 
-## Credits
+## Acknowledgments
 
-Built with:
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp) - Video downloader
-- [Flask](https://flask.palletsprojects.com/) - Web framework
-- [ffmpeg](https://ffmpeg.org/) - Media processing
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) for the excellent download engine
+- [Flask](https://flask.palletsprojects.com/) for the web framework
+- [ffmpeg](https://ffmpeg.org/) for media processing

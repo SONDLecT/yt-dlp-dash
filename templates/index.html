@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>yt-dlp Web Downloader</title>
+    <title>yt-dlp Dash</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -390,6 +391,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: var(--text-primary);
         }
 
         .modal-footer {
@@ -693,7 +695,7 @@
     
     <div class="container">
         <div class="header">
-            <h1>🎬 yt-dlp Web</h1>
+            <h1>🎬 yt-dlp Dash</h1>
             <p>Download videos from YouTube and <a href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md" target="_blank" style="color: var(--accent); text-decoration: none;">other platforms</a></p>
             <div id="versionBadge" style="margin-top: 15px; display: none;">
                 <span style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
@@ -764,6 +766,11 @@
                 <div class="checkbox-group" title="Download all videos in the playlist starting from this video">
                     <input type="checkbox" id="downloadPlaylist">
                     <label for="downloadPlaylist">Playlist</label>
+                </div>
+
+                <div class="input-group" style="min-width: 140px;" title="Maximum simultaneous downloads for playlists">
+                    <label for="maxConcurrent" style="font-size: 12px;">Max Concurrent</label>
+                    <input type="number" id="maxConcurrent" value="2" min="1" max="10" style="width: 100%; padding: 8px;">
                 </div>
             </div>
             
@@ -1597,9 +1604,29 @@
             closePlaylistModal();
             document.getElementById('url').value = '';
 
-            // Queue each video individually
-            for (const video of videos) {
-                await queueSingleDownload(video.url, false, video.title);
+            // Get max concurrent downloads setting
+            const maxConcurrent = parseInt(document.getElementById('maxConcurrent').value) || 2;
+
+            // Download with concurrency limit
+            const queue = [...videos];
+            const active = new Set();
+
+            async function processNext() {
+                if (queue.length === 0) return;
+
+                const video = queue.shift();
+                const promise = queueSingleDownload(video.url, false, video.title);
+                active.add(promise);
+
+                promise.finally(() => {
+                    active.delete(promise);
+                    processNext();
+                });
+            }
+
+            // Start initial batch up to maxConcurrent
+            for (let i = 0; i < Math.min(maxConcurrent, videos.length); i++) {
+                processNext();
             }
         }
 
