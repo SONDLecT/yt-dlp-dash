@@ -134,6 +134,17 @@
     <h4>Download Options</h4>
     <div class="options-container">
         <div class="option-group">
+            <h5>Playlist Concurrency</h5>
+            <div class="option-row">
+                <div class="option-item">
+                    <label for="maxConcurrent">Max Concurrent Downloads</label>
+                    <input type="number" id="maxConcurrent" value="2" min="1" max="10" placeholder="2">
+                    <small>Maximum simultaneous downloads for playlists</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="option-group">
             <h5>Rate Limiting & Performance</h5>
             <div class="option-row">
                 <div class="option-item">
