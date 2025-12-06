@@ -1637,11 +1637,14 @@
                 return;
             }
 
+            // Store settings before closing modal (important!)
+            const savedSettings = { ...pendingPlaylistDownload.settings };
+
             closePlaylistModal();
             document.getElementById('url').value = '';
 
             // Get max concurrent downloads setting
-            const maxConcurrent = parseInt(document.getElementById('maxConcurrent').value) || 2;
+            const maxConcurrent = parseInt(document.getElementById('maxConcurrent')?.value) || 2;
 
             // Download with concurrency limit
             const queue = [...videos];
@@ -1651,7 +1654,8 @@
                 if (queue.length === 0) return;
 
                 const video = queue.shift();
-                const promise = queueSingleDownload(video.url, false, video.title);
+                // Use saved settings from when modal was opened
+                const promise = queueSingleDownloadWithSettings(video.url, video.title, savedSettings);
                 active.add(promise);
 
                 promise.finally(() => {
