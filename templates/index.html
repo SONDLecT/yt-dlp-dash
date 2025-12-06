@@ -687,6 +687,35 @@
         </div>
     </div>
 
+    <!-- Channel Download Confirmation Modal -->
+    <div id="channelModal" class="modal-overlay">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="channelModalTitle">Channel Download</h3>
+                <p id="channelModalSubtitle">Confirm settings and select videos</p>
+            </div>
+            <div class="modal-body">
+                <!-- Settings Summary Section -->
+                <div id="channelSettingsSummary" style="background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 13px; color: var(--accent);">Download Settings</h4>
+                    <div id="channelSettingsContent" style="font-size: 12px; line-height: 1.6;"></div>
+                </div>
+
+                <!-- Video Selection -->
+                <div style="margin-bottom: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button type="button" class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="selectAllChannelVideos(true)">Select All</button>
+                    <button type="button" class="btn" style="padding: 6px 12px; font-size: 12px; background: var(--border-color); color: var(--text-primary);" onclick="selectAllChannelVideos(false)">Deselect All</button>
+                    <span id="channelVideoCount" style="font-size: 12px; color: var(--text-secondary); margin-left: auto;"></span>
+                </div>
+                <div id="channelVideoList" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" style="background: var(--border-color); color: var(--text-primary);" onclick="closeChannelModal()">Cancel</button>
+                <button type="button" class="btn" id="channelDownloadBtn" onclick="downloadSelectedChannelVideos()">Download Selected</button>
+            </div>
+        </div>
+    </div>
+
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
         <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -709,8 +738,8 @@
         
         <div class="card">
             <div class="input-group">
-                <label for="url">Video URL or Playlist</label>
-                <input type="text" id="url" class="url-input" placeholder="https://www.youtube.com/watch?v=..." />
+                <label for="url">Video URL, Playlist, or Channel</label>
+                <input type="text" id="url" class="url-input" placeholder="https://www.youtube.com/watch?v=... or @channelname" />
             </div>
             
             <div class="input-group">
@@ -766,6 +795,11 @@
                 <div class="checkbox-group" title="Download all videos in the playlist starting from this video">
                     <input type="checkbox" id="downloadPlaylist">
                     <label for="downloadPlaylist">Playlist</label>
+                </div>
+
+                <div class="checkbox-group" title="Download all videos from a YouTube channel">
+                    <input type="checkbox" id="downloadChannel">
+                    <label for="downloadChannel">Channel</label>
                 </div>
             </div>
             
@@ -1478,6 +1512,13 @@
             }
 
             const isPlaylistMode = document.getElementById('downloadPlaylist').checked;
+            const isChannelMode = document.getElementById('downloadChannel').checked;
+
+            // If channel mode, extract channel info first
+            if (isChannelMode) {
+                await extractAndShowChannel(url);
+                return;
+            }
 
             // If playlist mode, extract playlist info first
             if (isPlaylistMode) {
@@ -1622,6 +1663,253 @@
             // Start initial batch up to maxConcurrent
             for (let i = 0; i < Math.min(maxConcurrent, videos.length); i++) {
                 processNext();
+            }
+        }
+
+        // =====================
+        // Channel Download Functions
+        // =====================
+
+        let pendingChannelDownload = null;
+
+        function generateSettingsSummary() {
+            const settings = [];
+
+            // Save location
+            settings.push(`<strong>Save to:</strong> ${selectedDownloadPath}`);
+
+            // Quality/Format
+            const format = document.getElementById('format').value;
+            const formatLabels = {
+                'best': 'Best Quality',
+                'bestvideo+bestaudio': 'Best Video + Audio',
+                'worst': 'Lowest Quality',
+                '1080p': '1080p',
+                '720p': '720p',
+                '480p': '480p'
+            };
+            settings.push(`<strong>Quality:</strong> ${formatLabels[format] || format}`);
+
+            // Audio only
+            if (document.getElementById('audioOnly').checked) {
+                settings.push(`<strong>Audio Only:</strong> Yes (MP3)`);
+            }
+
+            // Subtitles
+            if (document.getElementById('subtitles').checked) {
+                settings.push(`<strong>Subtitles:</strong> Yes`);
+            }
+
+            // Max concurrent downloads
+            const maxConcurrentEl = document.getElementById('maxConcurrent');
+            if (maxConcurrentEl) {
+                settings.push(`<strong>Concurrent Downloads:</strong> ${maxConcurrentEl.value || 2}`);
+            }
+
+            // Check advanced options if any are set
+            const advancedOptions = collectAdvancedOptions();
+            const advancedCount = Object.keys(advancedOptions).length;
+            if (advancedCount > 0) {
+                settings.push(`<strong>Advanced Options:</strong> ${advancedCount} custom setting(s)`);
+            }
+
+            return settings.join('<br>');
+        }
+
+        async function extractAndShowChannel(url) {
+            const btn = document.getElementById('downloadBtn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Extracting channel...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/extract-playlist', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url })
+                });
+
+                const result = await response.json();
+
+                if (result.error && result.fallback) {
+                    if (confirm(`Could not extract channel info: ${result.error}\n\nTry downloading anyway?`)) {
+                        await queueSingleDownload(url, true);
+                    }
+                    return;
+                }
+
+                if (!result.is_playlist || result.video_count === 0) {
+                    alert('This does not appear to be a valid channel URL or the channel has no videos.');
+                    return;
+                }
+
+                // Show channel modal
+                showChannelModal(result, url);
+
+            } catch (error) {
+                alert('Error extracting channel info: ' + error);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                updateDownloadButton();
+            }
+        }
+
+        function showChannelModal(channelInfo, originalUrl) {
+            pendingChannelDownload = {
+                channelInfo,
+                originalUrl,
+                settings: {
+                    downloadPath: selectedDownloadPath,
+                    format: document.getElementById('format').value,
+                    audioOnly: document.getElementById('audioOnly').checked,
+                    subtitles: document.getElementById('subtitles').checked,
+                    customFlags: collectAdvancedOptions()
+                }
+            };
+
+            // Set modal title
+            document.getElementById('channelModalTitle').textContent = channelInfo.title || 'Channel';
+            document.getElementById('channelModalSubtitle').textContent =
+                `${channelInfo.video_count} videos${channelInfo.uploader ? ' by ' + channelInfo.uploader : ''}`;
+
+            // Generate and display settings summary
+            document.getElementById('channelSettingsContent').innerHTML = generateSettingsSummary();
+
+            // Populate video list
+            const listEl = document.getElementById('channelVideoList');
+            listEl.innerHTML = channelInfo.videos.map((video, i) => `
+                <div class="playlist-video-item">
+                    <input type="checkbox" id="channel_video_${i}"
+                           data-url="${video.url}"
+                           data-title="${escapeHtml(video.title)}"
+                           checked
+                           onchange="updateChannelDownloadBtn()">
+                    <span class="playlist-video-index">${video.index}.</span>
+                    <span class="playlist-video-title">${escapeHtml(video.title)}</span>
+                </div>
+            `).join('');
+
+            // Update video count
+            updateChannelVideoCount();
+
+            // Show modal
+            document.getElementById('channelModal').classList.add('visible');
+            updateChannelDownloadBtn();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function closeChannelModal() {
+            document.getElementById('channelModal').classList.remove('visible');
+            pendingChannelDownload = null;
+        }
+
+        function selectAllChannelVideos(selectAll) {
+            document.querySelectorAll('#channelVideoList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectAll;
+            });
+            updateChannelDownloadBtn();
+            updateChannelVideoCount();
+        }
+
+        function updateChannelVideoCount() {
+            const total = document.querySelectorAll('#channelVideoList input[type="checkbox"]').length;
+            const selected = document.querySelectorAll('#channelVideoList input[type="checkbox"]:checked').length;
+            document.getElementById('channelVideoCount').textContent = `${selected} of ${total} selected`;
+        }
+
+        function updateChannelDownloadBtn() {
+            const selected = document.querySelectorAll('#channelVideoList input[type="checkbox"]:checked').length;
+            const btn = document.getElementById('channelDownloadBtn');
+            btn.textContent = `Download ${selected} Video${selected !== 1 ? 's' : ''}`;
+            btn.disabled = selected === 0;
+            updateChannelVideoCount();
+        }
+
+        async function downloadSelectedChannelVideos() {
+            if (!pendingChannelDownload) return;
+
+            const checkboxes = document.querySelectorAll('#channelVideoList input[type="checkbox"]:checked');
+            const videos = Array.from(checkboxes).map(cb => ({
+                url: cb.dataset.url,
+                title: cb.dataset.title
+            }));
+
+            if (videos.length === 0) {
+                alert('Please select at least one video');
+                return;
+            }
+
+            // Store settings before closing modal
+            const savedSettings = { ...pendingChannelDownload.settings };
+
+            closeChannelModal();
+            document.getElementById('url').value = '';
+
+            // Get max concurrent downloads setting
+            const maxConcurrent = parseInt(document.getElementById('maxConcurrent')?.value) || 2;
+
+            // Download with concurrency limit
+            const queue = [...videos];
+            const active = new Set();
+
+            async function processNext() {
+                if (queue.length === 0) return;
+
+                const video = queue.shift();
+                // Use saved settings from when modal was opened
+                const promise = queueSingleDownloadWithSettings(video.url, video.title, savedSettings);
+                active.add(promise);
+
+                promise.finally(() => {
+                    active.delete(promise);
+                    processNext();
+                });
+            }
+
+            // Start initial batch up to maxConcurrent
+            for (let i = 0; i < Math.min(maxConcurrent, videos.length); i++) {
+                processNext();
+            }
+        }
+
+        async function queueSingleDownloadWithSettings(url, displayTitle, settings) {
+            const data = {
+                url: url,
+                downloadPath: settings.downloadPath,
+                format: settings.format,
+                audioOnly: settings.audioOnly,
+                subtitles: settings.subtitles,
+                downloadPlaylist: false,
+                customFlags: settings.customFlags
+            };
+
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    activeDownloads[result.download_id] = {
+                        url: displayTitle || url,
+                        directory: data.downloadPath
+                    };
+                    updateActiveDownloads();
+                    pollStatus(result.download_id);
+                } else {
+                    console.error('Download error:', result.error);
+                }
+            } catch (error) {
+                console.error('Failed to start download:', error);
             }
         }
 
