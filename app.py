@@ -87,34 +87,103 @@ def progress_hook(d, download_id):
             'message': 'Processing download...'
         })
 
+def generate_nfo_file(info, filepath, download_id):
+    """Generate a Kodi-compatible NFO file from video metadata"""
+    try:
+        base_name = os.path.splitext(filepath)[0]
+        nfo_path = f"{base_name}.nfo"
+
+        # Format duration as HH:MM:SS
+        duration_seconds = info.get('duration', 0) or 0
+        hours, remainder = divmod(int(duration_seconds), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        duration_str = f"{hours}:{minutes:02d}:{seconds:02d}" if hours else f"{minutes}:{seconds:02d}"
+
+        # Format upload date
+        upload_date = info.get('upload_date', '')
+        if upload_date and len(upload_date) == 8:
+            formatted_date = f"{upload_date[:4]}-{upload_date[4:6]}-{upload_date[6:8]}"
+        else:
+            formatted_date = upload_date
+
+        # Escape XML special characters
+        def escape_xml(text):
+            if not text:
+                return ''
+            return (str(text)
+                    .replace('&', '&amp;')
+                    .replace('<', '&lt;')
+                    .replace('>', '&gt;')
+                    .replace('"', '&quot;')
+                    .replace("'", '&apos;'))
+
+        # Build NFO XML content
+        nfo_content = f'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<movie>
+    <title>{escape_xml(info.get('title', 'Unknown'))}</title>
+    <originaltitle>{escape_xml(info.get('title', 'Unknown'))}</originaltitle>
+    <plot>{escape_xml(info.get('description', ''))}</plot>
+    <runtime>{duration_str}</runtime>
+    <year>{formatted_date[:4] if formatted_date else ''}</year>
+    <premiered>{formatted_date}</premiered>
+    <studio>{escape_xml(info.get('channel', info.get('uploader', '')))}</studio>
+    <director>{escape_xml(info.get('uploader', ''))}</director>
+    <id>{escape_xml(info.get('id', ''))}</id>
+    <uniqueid type="youtube">{escape_xml(info.get('id', ''))}</uniqueid>
+    <ratings>
+        <rating name="youtube" max="5">
+            <value>{info.get('average_rating', 0) or 0}</value>
+            <votes>{info.get('view_count', 0) or 0}</votes>
+        </rating>
+    </ratings>
+    <thumb>{escape_xml(info.get('thumbnail', ''))}</thumb>
+    <genre>YouTube</genre>
+    <tag>{escape_xml(info.get('channel', info.get('uploader', '')))}</tag>
+</movie>
+'''
+
+        with open(nfo_path, 'w', encoding='utf-8') as f:
+            f.write(nfo_content)
+
+        logger.info(f"[{download_id}] Generated NFO file: {nfo_path}")
+        return nfo_path
+
+    except Exception as e:
+        logger.error(f"[{download_id}] Failed to generate NFO file: {e}")
+        return None
+
+
 def download_video(url, options, download_id, download_dir):
     """Background task to download video"""
     try:
         logger.info(f"[{download_id}] Starting download of {url} to {download_dir}")
         logger.info(f"[{download_id}] Options: {json.dumps(options, indent=2)}")
-        
+
+        # Extract NFO flag before passing to yt-dlp (it's not a valid yt-dlp option)
+        generate_nfo = options.pop('_generate_nfo', False)
+
         ydl_opts = {
             'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
             'progress_hooks': [lambda d: progress_hook(d, download_id)],
             'logger': ProgressLogger(download_id),
             'verbose': True,  # Enable verbose logging for yt-dlp
         }
-        
+
         # Merge user options
         ydl_opts.update(options)
-        
+
         logger.info(f"[{download_id}] Final yt-dlp options: {json.dumps(ydl_opts, indent=2, default=str)}")
-        
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             logger.info(f"[{download_id}] Extracting info from URL...")
             info = ydl.extract_info(url, download=True)
-            
+
             # Get the actual downloaded filename
             filename = ydl.prepare_filename(info)
-            
+
             # For audio files, the extension might be different
             if options.get('postprocessors'):
-                # Check if MP3 conversion was requested
+                # Check if audio extraction was requested
                 for pp in options['postprocessors']:
                     if pp.get('key') == 'FFmpegExtractAudio':
                         # Replace extension with the actual audio format
@@ -122,7 +191,13 @@ def download_video(url, options, download_id, download_dir):
                         audio_ext = pp.get('preferredcodec', 'mp3')
                         filename = f"{base_name}.{audio_ext}"
                         logger.info(f"[{download_id}] Audio file expected at: {filename}")
-            
+                    elif pp.get('key') == 'FFmpegVideoConvertor':
+                        # Replace extension with the requested format
+                        base_name = os.path.splitext(filename)[0]
+                        video_ext = pp.get('preferedformat', 'mp4')
+                        filename = f"{base_name}.{video_ext}"
+                        logger.info(f"[{download_id}] Video file expected at: {filename}")
+
             # Check if file actually exists
             if not os.path.exists(filename):
                 logger.warning(f"[{download_id}] Expected file not found at {filename}, checking directory...")
@@ -130,22 +205,26 @@ def download_video(url, options, download_id, download_dir):
                 if os.path.exists(download_dir):
                     files = os.listdir(download_dir)
                     logger.info(f"[{download_id}] Files in {download_dir}: {files}")
-            
+
+            # Generate NFO file if requested
+            if generate_nfo and info:
+                generate_nfo_file(info, filename, download_id)
+
             logger.info(f"[{download_id}] Download completed successfully: {filename}")
-            
+
             download_status[download_id].update({
                 'status': 'completed',
                 'message': f'Download completed: {os.path.basename(filename)}',
                 'filename': os.path.basename(filename),
                 'full_path': filename
             })
-            
+
     except Exception as e:
         error_msg = str(e)
         error_trace = traceback.format_exc()
         logger.error(f"[{download_id}] Download failed: {error_msg}")
         logger.error(f"[{download_id}] Traceback: {error_trace}")
-        
+
         download_status[download_id].update({
             'status': 'error',
             'error': error_msg,
@@ -355,42 +434,94 @@ def download():
     
     # Parse options
     options = {}
-    
+    postprocessors = []
+
     # Playlist handling - by default, only download single video
     if not data.get('downloadPlaylist', False):
         options['noplaylist'] = True
         logger.info(f"[{download_id}] Single video mode enabled (noplaylist: true)")
     else:
         logger.info(f"[{download_id}] Playlist mode enabled")
-    
-    # Format selection
-    format_option = data.get('format', 'best')
-    if format_option != 'best':
-        options['format'] = format_option
-    
-    # Audio only
+
+    # Quality selection - convert to yt-dlp format strings
+    quality_option = data.get('quality', 'best')
+    quality_map = {
+        'best': 'bestvideo+bestaudio/best',
+        '8k': 'bestvideo[height<=4320]+bestaudio/best[height<=4320]',
+        '4k': 'bestvideo[height<=2160]+bestaudio/best[height<=2160]',
+        '1440p': 'bestvideo[height<=1440]+bestaudio/best[height<=1440]',
+        '1080p': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
+        '720p': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
+        '480p': 'bestvideo[height<=480]+bestaudio/best[height<=480]',
+        '360p': 'bestvideo[height<=360]+bestaudio/best[height<=360]',
+        'worst': 'worstvideo+worstaudio/worst',
+    }
+    options['format'] = quality_map.get(quality_option, 'bestvideo+bestaudio/best')
+
+    # Output format (container) selection
+    output_format = data.get('outputFormat', 'auto')
+    if output_format != 'auto':
+        postprocessors.append({
+            'key': 'FFmpegVideoConvertor',
+            'preferedformat': output_format,  # Note: yt-dlp uses 'preferedformat' (typo is intentional)
+        })
+        logger.info(f"[{download_id}] Output format: {output_format}")
+
+    # Audio only mode
     if data.get('audioOnly', False):
+        audio_format = data.get('audioFormat', 'mp3')
         options['format'] = 'bestaudio/best'
-        options['postprocessors'] = [{
+        postprocessors.append({
             'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-        }]
-    
+            'preferredcodec': audio_format,
+            'preferredquality': '0',  # Best quality
+        })
+        logger.info(f"[{download_id}] Audio only mode: {audio_format}")
+
     # Subtitle options
     if data.get('subtitles', False):
         options['writesubtitles'] = True
         options['writeautomaticsub'] = True
-    
+        logger.info(f"[{download_id}] Subtitles enabled")
+
+    # Thumbnail options
+    if data.get('thumbnail', False):
+        options['writethumbnail'] = True
+        logger.info(f"[{download_id}] Save thumbnail enabled")
+
+    if data.get('embedThumbnail', False):
+        postprocessors.append({'key': 'EmbedThumbnail'})
+        # Also need to write thumbnail first for embedding
+        options['writethumbnail'] = True
+        logger.info(f"[{download_id}] Embed thumbnail enabled")
+
+    # Metadata options
+    metadata_mode = data.get('metadataMode', 'embed')
+    if metadata_mode in ['embed', 'both']:
+        postprocessors.append({'key': 'FFmpegMetadata'})
+        options['addmetadata'] = True
+        logger.info(f"[{download_id}] Metadata embedding enabled")
+
+    if metadata_mode in ['nfo', 'both']:
+        options['writeinfojson'] = True
+        # Store for NFO generation in post-processing
+        options['_generate_nfo'] = True
+        logger.info(f"[{download_id}] NFO generation enabled")
+
+    # Add postprocessors if any were configured
+    if postprocessors:
+        options['postprocessors'] = postprocessors
+
     # Custom output template
     if data.get('outputTemplate'):
         options['outtmpl'] = os.path.join(download_dir, data['outputTemplate'])
-    
+
     # Playlist handling
     if data.get('playlistStart'):
         options['playliststart'] = int(data['playlistStart'])
     if data.get('playlistEnd'):
         options['playlistend'] = int(data['playlistEnd'])
-    
+
     # Custom flags (advanced) - handle all possible yt-dlp options
     custom_flags = data.get('customFlags', {})
     if custom_flags:
@@ -399,7 +530,7 @@ def download():
             if value is not None and value != '' and value != False:
                 # Convert camelCase from JS to snake_case for yt-dlp
                 snake_key = re.sub('([A-Z])', r'_\1', key).lower()
-                
+
                 # Handle special cases
                 if snake_key in ['ignore_errors', 'no_warnings', 'quiet', 'verbose']:
                     options[snake_key] = value
@@ -412,7 +543,7 @@ def download():
                 else:
                     # Direct mapping for most options
                     options[snake_key] = value
-        
+
         logger.info(f"[{download_id}] Advanced options applied: {len(custom_flags)} settings")
     
     # Start download in background thread

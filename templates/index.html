@@ -657,11 +657,62 @@
                 width: 40px;
                 height: 40px;
             }
-            
+
             .theme-toggle svg {
                 width: 20px;
                 height: 20px;
             }
+        }
+
+        /* Download Type Selector */
+        .download-type-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .type-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 16px;
+            background: var(--file-item-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .type-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent);
+        }
+
+        .type-btn.active {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Improved input group styling */
+        .input-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group select {
+            margin-top: 6px;
+        }
+
+        /* Audio format disabled state */
+        #audioFormat:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -769,39 +820,97 @@
                 </div>
             </div>
             
-            <div class="options-grid">
+            <!-- Download Type Selection -->
+            <div class="download-type-selector" style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button type="button" class="type-btn active" id="typeSingle" onclick="setDownloadType('single')">
+                    Single Video
+                </button>
+                <button type="button" class="type-btn" id="typePlaylist" onclick="setDownloadType('playlist')">
+                    Playlist
+                </button>
+                <button type="button" class="type-btn" id="typeChannel" onclick="setDownloadType('channel')">
+                    Channel
+                </button>
+            </div>
+
+            <!-- Main Options Grid -->
+            <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+                <!-- Quality -->
                 <div class="input-group">
-                    <label for="format">Quality</label>
-                    <select id="format">
-                        <option value="best">Best Quality</option>
-                        <option value="bestvideo+bestaudio">Best Video + Audio</option>
-                        <option value="worst">Worst Quality (smallest)</option>
-                        <option value="1080p">1080p</option>
-                        <option value="720p">720p</option>
-                        <option value="480p">480p</option>
+                    <label for="quality">Quality</label>
+                    <select id="quality">
+                        <option value="best">Best Available</option>
+                        <option value="8k">8K (4320p)</option>
+                        <option value="4k">4K (2160p)</option>
+                        <option value="1440p">1440p (2K)</option>
+                        <option value="1080p">1080p (Full HD)</option>
+                        <option value="720p">720p (HD)</option>
+                        <option value="480p">480p (SD)</option>
+                        <option value="360p">360p</option>
+                        <option value="worst">Lowest Quality</option>
                     </select>
                 </div>
-                
-                <div class="checkbox-group">
-                    <input type="checkbox" id="audioOnly">
-                    <label for="audioOnly">Audio Only (MP3)</label>
+
+                <!-- Format -->
+                <div class="input-group">
+                    <label for="outputFormat">Format</label>
+                    <select id="outputFormat">
+                        <option value="auto">Auto (recommended)</option>
+                        <option value="mp4">MP4</option>
+                        <option value="mkv">MKV</option>
+                        <option value="webm">WebM</option>
+                    </select>
                 </div>
-                
+
+                <!-- Audio Only Toggle + Format -->
+                <div class="input-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="audioOnly" style="width: 18px; height: 18px;" onchange="toggleAudioOptions()">
+                        Audio Only
+                    </label>
+                    <select id="audioFormat" style="margin-top: 8px;" disabled>
+                        <option value="mp3">MP3</option>
+                        <option value="m4a">M4A (AAC)</option>
+                        <option value="flac">FLAC (lossless)</option>
+                        <option value="opus">Opus</option>
+                        <option value="wav">WAV</option>
+                        <option value="best">Best Available</option>
+                    </select>
+                </div>
+
+                <!-- Metadata -->
+                <div class="input-group">
+                    <label for="metadataMode">Metadata</label>
+                    <select id="metadataMode">
+                        <option value="embed">Embed in file</option>
+                        <option value="nfo">NFO file (Kodi/Jellyfin)</option>
+                        <option value="both">Both (embed + NFO)</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Secondary Options Row -->
+            <div class="options-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-top: 15px;">
                 <div class="checkbox-group">
                     <input type="checkbox" id="subtitles">
                     <label for="subtitles">Download Subtitles</label>
                 </div>
-                
-                <div class="checkbox-group" title="Download all videos in the playlist starting from this video">
-                    <input type="checkbox" id="downloadPlaylist">
-                    <label for="downloadPlaylist">Playlist</label>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="thumbnail">
+                    <label for="thumbnail">Save Thumbnail</label>
                 </div>
 
-                <div class="checkbox-group" title="Download all videos from a YouTube channel">
-                    <input type="checkbox" id="downloadChannel">
-                    <label for="downloadChannel">Channel</label>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="embedThumbnail" checked>
+                    <label for="embedThumbnail">Embed Thumbnail</label>
                 </div>
             </div>
+
+            <!-- Hidden checkboxes for backwards compatibility -->
+            <input type="checkbox" id="downloadPlaylist" style="display: none;">
+            <input type="checkbox" id="downloadChannel" style="display: none;">
             
             <div class="advanced-section">
                 <button class="toggle-advanced" onclick="toggleAdvanced()">⚙️ Advanced Options</button>
@@ -856,7 +965,44 @@
     <script>
         let activeDownloads = {};
         let isUpdating = false;
-        
+        let currentDownloadType = 'single'; // 'single', 'playlist', or 'channel'
+
+        // Download type selector
+        function setDownloadType(type) {
+            currentDownloadType = type;
+
+            // Update button states
+            document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('type' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+
+            // Update hidden checkboxes for backwards compatibility
+            document.getElementById('downloadPlaylist').checked = (type === 'playlist');
+            document.getElementById('downloadChannel').checked = (type === 'channel');
+        }
+
+        // Toggle audio format dropdown based on Audio Only checkbox
+        function toggleAudioOptions() {
+            const audioOnly = document.getElementById('audioOnly').checked;
+            const audioFormat = document.getElementById('audioFormat');
+            const outputFormat = document.getElementById('outputFormat');
+            const quality = document.getElementById('quality');
+
+            audioFormat.disabled = !audioOnly;
+
+            // When audio only is checked, disable video-related options
+            if (audioOnly) {
+                outputFormat.disabled = true;
+                outputFormat.style.opacity = '0.5';
+                quality.disabled = true;
+                quality.style.opacity = '0.5';
+            } else {
+                outputFormat.disabled = false;
+                outputFormat.style.opacity = '1';
+                quality.disabled = false;
+                quality.style.opacity = '1';
+            }
+        }
+
         // Theme management (dark is default)
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -1577,9 +1723,14 @@
                 originalUrl,
                 settings: {
                     downloadPath: selectedDownloadPath,
-                    format: document.getElementById('format').value,
+                    quality: document.getElementById('quality').value,
+                    outputFormat: document.getElementById('outputFormat').value,
                     audioOnly: document.getElementById('audioOnly').checked,
+                    audioFormat: document.getElementById('audioFormat').value,
                     subtitles: document.getElementById('subtitles').checked,
+                    thumbnail: document.getElementById('thumbnail').checked,
+                    embedThumbnail: document.getElementById('embedThumbnail').checked,
+                    metadataMode: document.getElementById('metadataMode').value,
                     customFlags: collectAdvancedOptions()
                 }
             };
@@ -1623,6 +1774,12 @@
         // Add change listener for checkboxes
         document.getElementById('playlistVideoList')?.addEventListener('change', updatePlaylistDownloadBtn);
 
+        // Queue management for showing all pending downloads
+        let queueIdCounter = 0;
+        const pendingQueue = []; // Videos waiting to start
+        let activeDownloadCount = 0;
+        let currentMaxConcurrent = 1;
+
         async function downloadSelectedPlaylistVideos() {
             if (!pendingPlaylistDownload) return;
 
@@ -1637,33 +1794,125 @@
                 return;
             }
 
+            // Store settings BEFORE closing modal (which sets pendingPlaylistDownload to null)
+            const batchSettings = { ...pendingPlaylistDownload.settings };
+
             closePlaylistModal();
             document.getElementById('url').value = '';
 
             // Get max concurrent downloads setting
-            const maxConcurrent = parseInt(document.getElementById('maxConcurrent').value) || 2;
+            const maxConcurrentEl = document.getElementById('maxConcurrent');
+            currentMaxConcurrent = maxConcurrentEl ? parseInt(maxConcurrentEl.value) || 1 : 1;
 
-            // Download with concurrency limit
-            const queue = [...videos];
-            const active = new Set();
+            // Immediately add ALL videos to the UI as queued
+            const queuedItems = videos.map(video => {
+                const queueId = `queued_${++queueIdCounter}`;
+                activeDownloads[queueId] = {
+                    status: 'queued',
+                    url: video.title || video.url,
+                    directory: batchSettings.downloadPath,
+                    queueId: queueId,
+                    videoUrl: video.url,
+                    videoTitle: video.title,
+                    settings: batchSettings
+                };
+                return queueId;
+            });
 
-            async function processNext() {
-                if (queue.length === 0) return;
+            updateActiveDownloads();
 
-                const video = queue.shift();
-                const promise = queueSingleDownload(video.url, false, video.title);
-                active.add(promise);
+            // Process the queue
+            processDownloadQueue();
+        }
 
-                promise.finally(() => {
-                    active.delete(promise);
-                    processNext();
-                });
+        async function processDownloadQueue() {
+            // Find queued items that can be started
+            const queuedIds = Object.entries(activeDownloads)
+                .filter(([id, dl]) => dl.status === 'queued')
+                .map(([id]) => id);
+
+            // Start downloads up to max concurrent limit
+            while (activeDownloadCount < currentMaxConcurrent && queuedIds.length > 0) {
+                const queueId = queuedIds.shift();
+                const queuedItem = activeDownloads[queueId];
+
+                if (!queuedItem || queuedItem.status !== 'queued') continue;
+
+                activeDownloadCount++;
+                startQueuedDownload(queueId, queuedItem);
             }
+        }
 
-            // Start initial batch up to maxConcurrent
-            for (let i = 0; i < Math.min(maxConcurrent, videos.length); i++) {
-                processNext();
+        async function startQueuedDownload(queueId, queuedItem) {
+            try {
+                // Update status to starting
+                activeDownloads[queueId].status = 'starting';
+                updateActiveDownloads();
+
+                // Actually start the download
+                const downloadId = await queueSingleDownloadWithSettings(
+                    queuedItem.videoUrl,
+                    queuedItem.videoTitle,
+                    queuedItem.settings
+                );
+
+                if (downloadId) {
+                    // Transfer the download info to the real download ID
+                    activeDownloads[downloadId] = {
+                        ...activeDownloads[downloadId],
+                        originalQueueId: queueId
+                    };
+                    // Remove the queued placeholder
+                    delete activeDownloads[queueId];
+                    updateActiveDownloads();
+
+                    // Wait for completion then process next
+                    await waitForDownloadComplete(downloadId);
+                } else {
+                    // Download failed to start
+                    activeDownloads[queueId].status = 'error';
+                    activeDownloads[queueId].error = 'Failed to start download';
+                    updateActiveDownloads();
+                }
+            } catch (error) {
+                console.error('Error starting download:', error);
+                if (activeDownloads[queueId]) {
+                    activeDownloads[queueId].status = 'error';
+                    activeDownloads[queueId].error = error.message;
+                    updateActiveDownloads();
+                }
+            } finally {
+                activeDownloadCount--;
+                // Process next in queue
+                processDownloadQueue();
             }
+        }
+
+        function cancelQueuedDownload(queueId) {
+            if (activeDownloads[queueId] && activeDownloads[queueId].status === 'queued') {
+                activeDownloads[queueId].status = 'cancelled';
+                activeDownloads[queueId].message = 'Cancelled before starting';
+                updateActiveDownloads();
+                // Auto-remove after a moment
+                setTimeout(() => {
+                    delete activeDownloads[queueId];
+                    updateActiveDownloads();
+                }, 3000);
+            }
+        }
+
+        function waitForDownloadComplete(downloadId) {
+            return new Promise(resolve => {
+                const checkStatus = () => {
+                    const download = activeDownloads[downloadId];
+                    if (!download || download.status === 'completed' || download.status === 'error' || download.status === 'cancelled') {
+                        resolve();
+                    } else {
+                        setTimeout(checkStatus, 1000);
+                    }
+                };
+                checkStatus();
+            });
         }
 
         // =====================
@@ -1678,32 +1927,60 @@
             // Save location
             settings.push(`<strong>Save to:</strong> ${selectedDownloadPath}`);
 
-            // Quality/Format
-            const format = document.getElementById('format').value;
-            const formatLabels = {
-                'best': 'Best Quality',
-                'bestvideo+bestaudio': 'Best Video + Audio',
-                'worst': 'Lowest Quality',
-                '1080p': '1080p',
-                '720p': '720p',
-                '480p': '480p'
+            // Quality
+            const quality = document.getElementById('quality').value;
+            const qualityLabels = {
+                'best': 'Best Available',
+                '8k': '8K (4320p)',
+                '4k': '4K (2160p)',
+                '1440p': '1440p (2K)',
+                '1080p': '1080p (Full HD)',
+                '720p': '720p (HD)',
+                '480p': '480p (SD)',
+                '360p': '360p',
+                'worst': 'Lowest Quality'
             };
-            settings.push(`<strong>Quality:</strong> ${formatLabels[format] || format}`);
+            settings.push(`<strong>Quality:</strong> ${qualityLabels[quality] || quality}`);
+
+            // Output format
+            const outputFormat = document.getElementById('outputFormat').value;
+            if (outputFormat !== 'auto') {
+                settings.push(`<strong>Format:</strong> ${outputFormat.toUpperCase()}`);
+            }
 
             // Audio only
             if (document.getElementById('audioOnly').checked) {
-                settings.push(`<strong>Audio Only:</strong> Yes (MP3)`);
+                const audioFormat = document.getElementById('audioFormat').value;
+                settings.push(`<strong>Audio Only:</strong> ${audioFormat.toUpperCase()}`);
             }
+
+            // Metadata
+            const metadataMode = document.getElementById('metadataMode').value;
+            const metadataLabels = {
+                'embed': 'Embed in file',
+                'nfo': 'NFO file (Kodi)',
+                'both': 'Embed + NFO',
+                'none': 'None'
+            };
+            settings.push(`<strong>Metadata:</strong> ${metadataLabels[metadataMode]}`);
 
             // Subtitles
             if (document.getElementById('subtitles').checked) {
                 settings.push(`<strong>Subtitles:</strong> Yes`);
             }
 
+            // Thumbnail
+            if (document.getElementById('thumbnail').checked || document.getElementById('embedThumbnail').checked) {
+                const thumbOptions = [];
+                if (document.getElementById('thumbnail').checked) thumbOptions.push('Save');
+                if (document.getElementById('embedThumbnail').checked) thumbOptions.push('Embed');
+                settings.push(`<strong>Thumbnail:</strong> ${thumbOptions.join(' + ')}`);
+            }
+
             // Max concurrent downloads
             const maxConcurrentEl = document.getElementById('maxConcurrent');
             if (maxConcurrentEl) {
-                settings.push(`<strong>Concurrent Downloads:</strong> ${maxConcurrentEl.value || 2}`);
+                settings.push(`<strong>Concurrent Downloads:</strong> ${maxConcurrentEl.value || 5}`);
             }
 
             // Check advanced options if any are set
@@ -1761,9 +2038,14 @@
                 originalUrl,
                 settings: {
                     downloadPath: selectedDownloadPath,
-                    format: document.getElementById('format').value,
+                    quality: document.getElementById('quality').value,
+                    outputFormat: document.getElementById('outputFormat').value,
                     audioOnly: document.getElementById('audioOnly').checked,
+                    audioFormat: document.getElementById('audioFormat').value,
                     subtitles: document.getElementById('subtitles').checked,
+                    thumbnail: document.getElementById('thumbnail').checked,
+                    embedThumbnail: document.getElementById('embedThumbnail').checked,
+                    metadataMode: document.getElementById('metadataMode').value,
                     customFlags: collectAdvancedOptions()
                 }
             };
@@ -1846,45 +2128,47 @@
             }
 
             // Store settings before closing modal
-            const savedSettings = { ...pendingChannelDownload.settings };
+            const batchSettings = { ...pendingChannelDownload.settings };
 
             closeChannelModal();
             document.getElementById('url').value = '';
 
             // Get max concurrent downloads setting
-            const maxConcurrent = parseInt(document.getElementById('maxConcurrent')?.value) || 2;
+            const maxConcurrentEl = document.getElementById('maxConcurrent');
+            currentMaxConcurrent = maxConcurrentEl ? parseInt(maxConcurrentEl.value) || 1 : 1;
 
-            // Download with concurrency limit
-            const queue = [...videos];
-            const active = new Set();
+            // Immediately add ALL videos to the UI as queued
+            videos.forEach(video => {
+                const queueId = `queued_${++queueIdCounter}`;
+                activeDownloads[queueId] = {
+                    status: 'queued',
+                    url: video.title || video.url,
+                    directory: batchSettings.downloadPath,
+                    queueId: queueId,
+                    videoUrl: video.url,
+                    videoTitle: video.title,
+                    settings: batchSettings
+                };
+            });
 
-            async function processNext() {
-                if (queue.length === 0) return;
+            updateActiveDownloads();
 
-                const video = queue.shift();
-                // Use saved settings from when modal was opened
-                const promise = queueSingleDownloadWithSettings(video.url, video.title, savedSettings);
-                active.add(promise);
-
-                promise.finally(() => {
-                    active.delete(promise);
-                    processNext();
-                });
-            }
-
-            // Start initial batch up to maxConcurrent
-            for (let i = 0; i < Math.min(maxConcurrent, videos.length); i++) {
-                processNext();
-            }
+            // Process the queue
+            processDownloadQueue();
         }
 
         async function queueSingleDownloadWithSettings(url, displayTitle, settings) {
             const data = {
                 url: url,
                 downloadPath: settings.downloadPath,
-                format: settings.format,
+                quality: settings.quality,
+                outputFormat: settings.outputFormat,
                 audioOnly: settings.audioOnly,
+                audioFormat: settings.audioFormat,
                 subtitles: settings.subtitles,
+                thumbnail: settings.thumbnail,
+                embedThumbnail: settings.embedThumbnail,
+                metadataMode: settings.metadataMode,
                 downloadPlaylist: false,
                 customFlags: settings.customFlags
             };
@@ -1905,11 +2189,14 @@
                     };
                     updateActiveDownloads();
                     pollStatus(result.download_id);
+                    return result.download_id;
                 } else {
                     console.error('Download error:', result.error);
+                    return null;
                 }
             } catch (error) {
                 console.error('Failed to start download:', error);
+                return null;
             }
         }
 
@@ -1939,9 +2226,14 @@
             const data = {
                 url: url,
                 downloadPath: pendingPlaylistDownload?.settings?.downloadPath || selectedDownloadPath,
-                format: pendingPlaylistDownload?.settings?.format || document.getElementById('format').value,
+                quality: pendingPlaylistDownload?.settings?.quality || document.getElementById('quality').value,
+                outputFormat: pendingPlaylistDownload?.settings?.outputFormat || document.getElementById('outputFormat').value,
                 audioOnly: pendingPlaylistDownload?.settings?.audioOnly ?? document.getElementById('audioOnly').checked,
+                audioFormat: pendingPlaylistDownload?.settings?.audioFormat || document.getElementById('audioFormat').value,
                 subtitles: pendingPlaylistDownload?.settings?.subtitles ?? document.getElementById('subtitles').checked,
+                thumbnail: pendingPlaylistDownload?.settings?.thumbnail ?? document.getElementById('thumbnail').checked,
+                embedThumbnail: pendingPlaylistDownload?.settings?.embedThumbnail ?? document.getElementById('embedThumbnail').checked,
+                metadataMode: pendingPlaylistDownload?.settings?.metadataMode || document.getElementById('metadataMode').value,
                 downloadPlaylist: useNativePlaylist,
                 outputTemplate: advancedOptions.outtmpl || (outputTemplateEl ? outputTemplateEl.value.trim() : ''),
                 playlistStart: advancedOptions.playliststart || (playlistStartEl ? playlistStartEl.value : ''),
@@ -1966,11 +2258,14 @@
                     document.getElementById('url').value = '';
                     updateActiveDownloads();
                     pollStatus(result.download_id);
+                    return result.download_id;
                 } else {
                     console.error('Download error:', result.error);
+                    return null;
                 }
             } catch (error) {
                 console.error('Failed to start download:', error);
+                return null;
             }
         }
         
@@ -2011,16 +2306,18 @@
             }
 
             // Count by status
-            const counts = {active: 0, completed: 0, error: 0, cancelled: 0};
+            const counts = {active: 0, queued: 0, completed: 0, error: 0, cancelled: 0};
             downloads.forEach(([id, dl]) => {
                 if (dl.status === 'completed') counts.completed++;
                 else if (dl.status === 'error') counts.error++;
                 else if (dl.status === 'cancelled') counts.cancelled++;
+                else if (dl.status === 'queued') counts.queued++;
                 else counts.active++;
             });
 
             let headerHtml = `<div style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary);">
                 <span style="margin-right: 15px;">📥 Active: <strong style="color: var(--text-primary);">${counts.active}</strong></span>
+                ${counts.queued > 0 ? `<span style="margin-right: 15px;">⏳ Queued: <strong style="color: var(--text-primary);">${counts.queued}</strong></span>` : ''}
                 ${counts.completed > 0 ? `<span style="margin-right: 15px;">✓ Done: <strong style="color: var(--success);">${counts.completed}</strong></span>` : ''}
                 ${counts.cancelled > 0 ? `<span style="margin-right: 15px;">⊘ Cancelled: <strong>${counts.cancelled}</strong></span>` : ''}
                 ${counts.error > 0 ? `<span>✗ Failed: <strong style="color: var(--error);">${counts.error}</strong></span>` : ''}
@@ -2045,6 +2342,9 @@
                 } else if (download.status === 'starting') {
                     statusClass = 'status-starting';
                     statusText = 'Starting';
+                } else if (download.status === 'queued') {
+                    statusClass = 'status-queued';
+                    statusText = 'Queued';
                 }
 
                 let progressHtml = '';
@@ -2064,10 +2364,11 @@
                 const destHtml = download.directory ?
                     `<div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">📁 ${download.directory}</div>` : '';
 
-                // Show cancel button for active downloads
+                // Show cancel button for active and queued downloads
                 const canCancel = !['completed', 'error', 'cancelled'].includes(download.status);
+                const isQueued = download.status === 'queued';
                 const cancelBtn = canCancel ?
-                    `<button class="cancel-btn-small" onclick="cancelDownload('${id}')" title="Cancel download">✕ Cancel</button>` : '';
+                    `<button class="cancel-btn-small" onclick="${isQueued ? `cancelQueuedDownload('${id}')` : `cancelDownload('${id}')`}" title="Cancel download">✕ Cancel</button>` : '';
 
                 return `
                     <div class="download-item" style="position: relative;">
